@@ -135,13 +135,16 @@ def confidence(final, analysis, env, degraded, fallback):
 
 
 def signals_used(view, revealed):
+    """Signal paths exactly as named in the kit's signal dictionary (what the submission schema accepts)."""
+    valid = set(kit.ref("signal_dictionary.json")["signals"])
     used = []
     for k, v in view["signals"].items():
         if v is None or v == GATED:
             continue
-        if isinstance(v, dict) and all(x is None or x == GATED for x in v.values()):
-            continue
-        used.append(k)
+        if k in valid:
+            used.append(k)
+        elif isinstance(v, dict):
+            used += ["%s.%s" % (k, s) for s, x in v.items() if x not in (None, GATED) and "%s.%s" % (k, s) in valid]
     return used + sorted(revealed)
 
 
