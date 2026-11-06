@@ -27,6 +27,10 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `scripts/smoke_llm.py` | Lists models and tests key, JSON output and Finnish quality for one model |
 | `assistant/rules.py` | Safety envelope R1-R12: yes/no/unknown facts -> forced action, risk floor, escalation, questions to ask. Rules derived from patterns in the dev set; vocabularies (actions, topics, escalation targets) are the kit's |
 | `tests/test_rules.py` | 15 unit tests for the rules |
+| `assistant/kit.py` | The one place that imports the organisers' kit (textcheck, baseline templates, vocabularies, guidance corpus) |
+| `assistant/prompts.py` | Analysis and writer prompts. Step lists per action come from dev ground-truth frequencies; action, step, claim and jargon texts come from the kit |
+| `assistant/bot.py` | Single-turn pipeline: LLM analysis -> rules -> LLM wording -> validation (kit `textcheck` unsafe-claim, step, language and jargon checks) -> retry -> kit template fallback |
+| `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample) and writes a submission file plus the matching cases subset |
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |
 
@@ -34,8 +38,10 @@ What comes from the organisers and what we wrote. Updated with every change.
 | Path | Purpose |
 |---|---|
 | `out/baseline_dev.jsonl` | Baseline predictions on dev, used to reproduce the published numbers |
+| `out/*.jsonl` | Bot predictions and sampled case subsets from `scripts/run_single.py` |
+| `.llm_cache/` | Cached LLM replies (git-ignored) |
 
 ## Third-party services
 | Service | Role |
 |---|---|
-| Featherless.ai (open-weights models, OpenAI-compatible API) | LLM calls via `assistant/llm.py`; not yet exercised (no key in `.env`) |
+| Featherless.ai (open-weights models, OpenAI-compatible API) | LLM calls via `assistant/llm.py`; smoke-tested, first runs use `Qwen/Qwen3-30B-A3B-Instruct-2507` |
