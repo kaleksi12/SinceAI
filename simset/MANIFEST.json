@@ -1,0 +1,159 @@
+{
+  "package": "DNA_Digital_Security_Assistant_SimSet_v2.0.1",
+  "version": "2.0.1",
+  "built": "2026-11-04",
+  "files": {
+    "BUILD_REPORT.md": {
+      "bytes": 3093,
+      "sha256": "3b9ccc4f40fdb75c077c67743e0bb9bb2e90607fb65165df7d906f1c28de9552"
+    },
+    "CHANGELOG.md": {
+      "bytes": 2118,
+      "sha256": "e1b53ade4f7493cc6a9c5e3c441d3d3674c7e6b7938af7763c37ad76a4dcf51e"
+    },
+    "DATA_CARD.md": {
+      "bytes": 4117,
+      "sha256": "cab8ca6e0f8bde40d8b22fd7ae3b115bf000cd17cd8c3d2cf9eaf351854cc681"
+    },
+    "GLOSSARY.md": {
+      "bytes": 6281,
+      "sha256": "73813a7dd0e819976fceb626aa9f04f790093acef6dd44ca7a359055778a63e3"
+    },
+    "LICENSE": {
+      "bytes": 1799,
+      "sha256": "253d9a6b83961b80f94172ffeae5e782fa0b9a909f2c6fbc58ba049ba3c7d0fb"
+    },
+    "README.md": {
+      "bytes": 732,
+      "sha256": "b7ebef2656e432c941bb8d1aa4016a005fd9bbb2ac3f15fc163df5f9ed29b2fc"
+    },
+    "START_HERE.html": {
+      "bytes": 42894,
+      "sha256": "d2cb9b92cf29f6ad2e71c8808c750155ce7e88a6c6046a1ceffb590c6244ad0d"
+    },
+    "START_HERE.md": {
+      "bytes": 20094,
+      "sha256": "90f6e1a3d805d6578645163416173aea2451be206384ceaf274514bdd443fbc4"
+    },
+    "baselines/rules_baseline.py": {
+      "bytes": 19054,
+      "sha256": "86eb82152f4dd9311fe0ba9190892f4d2d7c90b602b2e09890f27f216f61e887"
+    },
+    "data/dev/cases.jsonl": {
+      "bytes": 2679634,
+      "sha256": "6d7308162ed97ac520d300e853f17d48dce12146cb4e965d6b4ded62aadf852d"
+    },
+    "data/dev/cases_overview.csv": {
+      "bytes": 85448,
+      "sha256": "16db28b535f6cf92b69635c2f68d154187c5d3b027343b4cb54d35fdd1a7609a"
+    },
+    "data/reference/action_vocabulary.json": {
+      "bytes": 4662,
+      "sha256": "2a55549117d19f5151ff4254dd5b5af38022311bbf07dd4560528ea403fe0c9f"
+    },
+    "data/reference/guidance_corpus.jsonl": {
+      "bytes": 52037,
+      "sha256": "566b05b92fbb73026cf37df27f48c93e687a1e62125dd1ec8f82239e660e19e5"
+    },
+    "data/reference/jargon.json": {
+      "bytes": 690,
+      "sha256": "d1f6c2b6c97ffe6db9784af0bde3bd750181d9bc7dabe22b817f862735c5dcd6"
+    },
+    "data/reference/question_topics.json": {
+      "bytes": 9806,
+      "sha256": "d465be8ed835dc44c6c425d96c413902e4483621a4fbcde0970664334ac7c248"
+    },
+    "data/reference/signal_dictionary.json": {
+      "bytes": 2509,
+      "sha256": "271d55c33f88940f7f0c67a2c6cf25f46512cd2f28d0cfb36421186b2fc699b1"
+    },
+    "data/reference/step_vocabulary.json": {
+      "bytes": 23911,
+      "sha256": "747af086ad5aa836e5496564c7e54f53f27844763e633724866215c118526dfa"
+    },
+    "data/reference/unsafe_claims.json": {
+      "bytes": 13937,
+      "sha256": "bad70d504e88a93d8db40f79af54962e7c07153b4b4222e0e799fe2c05f84ead"
+    },
+    "data/samples/five_journeys.jsonl": {
+      "bytes": 25433,
+      "sha256": "9aae1d0889b6baa050369415ce78c89124151f6aff9bd2320f46cccaac0fa0cf"
+    },
+    "data/test/inputs.jsonl": {
+      "bytes": 690292,
+      "sha256": "1be3b9ada8be87fbc6ff1b90034e95902e78a753d99542a67c3e2fc91dffb273"
+    },
+    "dsakit/__init__.py": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "dsakit/minischema.py": {
+      "bytes": 2644,
+      "sha256": "1ead495569617a96d85cb92a5246ec870e8d86a8362b18ed7d30f6f194e1f194"
+    },
+    "dsakit/scoring.py": {
+      "bytes": 20328,
+      "sha256": "c230a42413c58dc9423e9549851155a34615fae1d2baff51c5b028420c3853ec"
+    },
+    "dsakit/simulator.py": {
+      "bytes": 5333,
+      "sha256": "7694180816e2bd584092cc24617a626a564af1afb572f4c23e0cb0e88eb812a7"
+    },
+    "dsakit/textcheck.py": {
+      "bytes": 7441,
+      "sha256": "3ee9e19c4dd368eb5881234dda7e1e88cbca385fd1062cda1ea53a34991a7b87"
+    },
+    "eval/evaluate.py": {
+      "bytes": 6193,
+      "sha256": "9a35bf7505d8c375de32bef33268fef6787feec0d7ede0c5bd1af2807abf8dd0"
+    },
+    "examples/minimal_bot.js": {
+      "bytes": 2327,
+      "sha256": "5901653524d3761a628e044b59d76527d636687fd017a5ce3f9a2a52fbbed4fc"
+    },
+    "examples/python_bot.py": {
+      "bytes": 2810,
+      "sha256": "8c35311cf95875c58c5fd5bd1ef6a73fd3ba28778fae4d768d640e7782c2516d"
+    },
+    "schema/bot_reply.schema.json": {
+      "bytes": 1677,
+      "sha256": "1a740461924f7d7060184f99fafd699b529d5edf039689f38e4249a904082462"
+    },
+    "schema/case.schema.json": {
+      "bytes": 18834,
+      "sha256": "9e99976da7c7f4579780e2af71f19ea09e1b777e1c9aab646ef4af0d0be6f0e2"
+    },
+    "schema/submission.schema.json": {
+      "bytes": 4483,
+      "sha256": "c10a92bdf76787eec178871f8089d0880f0d0a3a35000f313133b52c0cf5870a"
+    },
+    "schema/test_input.schema.json": {
+      "bytes": 5347,
+      "sha256": "1eca32fdd11a981fdee9bc58e5c63f6ec0982f5f2ecd4f9ea6a3e87fd71d2c56"
+    },
+    "sim/PROTOCOL.md": {
+      "bytes": 3638,
+      "sha256": "63e99290388f885878e6fb25b07a226ea32d067a44c1e0041921004afbeaca25"
+    },
+    "sim/run_conversation.py": {
+      "bytes": 9246,
+      "sha256": "ea00eb142fddfc930057ff3de34920146d0607198dbf4dd663dbda950259ab72"
+    },
+    "templates/RESULTS_TEMPLATE.md": {
+      "bytes": 1912,
+      "sha256": "77b5c2a5299572aee4b8666dd69e222b84e63efe51607200ca10708bf7ea6b0d"
+    },
+    "templates/human_review_form.csv": {
+      "bytes": 182,
+      "sha256": "47ff959c8a8b7e216443db85eccca3144ee54ccb7e52ec22f049757a7c48ce9c"
+    },
+    "tests/test_dsakit.py": {
+      "bytes": 8069,
+      "sha256": "69260f0035c12000ec30f661d0d710fe34d726c345108653cd13d9579bd2e535"
+    },
+    "tools/validate.py": {
+      "bytes": 6802,
+      "sha256": "8c3e39efff303d18206cf6729c781e608e3316527fe1b9d1d38a42732635e8cf"
+    }
+  }
+}

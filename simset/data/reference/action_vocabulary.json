@@ -1,0 +1,96 @@
+{
+  "version": "2.0.1",
+  "risk_levels": [
+    "none",
+    "low",
+    "medium",
+    "high",
+    "critical"
+  ],
+  "urgency": {
+    "none": "Nothing needs to be done.",
+    "routine": "Act when convenient; no time pressure.",
+    "today": "Act today; delay increases the chance of harm.",
+    "immediate": "Act now; minutes matter (money, codes or an active takeover)."
+  },
+  "actions": {
+    "no_action_needed": {
+      "en": "The message or event is legitimate or harmless. Confirm this and explain why.",
+      "fi": "Viesti tai tapahtuma on aito tai harmiton. Vahvista tämä ja kerro miksi.",
+      "intervention": 0
+    },
+    "do_not_interact_and_delete": {
+      "en": "Do not click, reply, pay or call back. Delete or report the message.",
+      "fi": "Älä klikkaa, vastaa, maksa tai soita takaisin. Poista tai ilmoita viesti.",
+      "intervention": 1
+    },
+    "verify_via_official_channel": {
+      "en": "Do not use the contact details in the message or call. Verify through the official app, a number you already know, or the organisation's own website.",
+      "fi": "Älä käytä viestin tai puhelun yhteystietoja. Tarkista asia virallisesta sovelluksesta, tunnetusta numerosta tai organisaation omilta sivuilta.",
+      "intervention": 2
+    },
+    "contact_operator_support": {
+      "en": "Contact the operator through official channels about SIM or eSIM changes, number porting, subscription orders or billing.",
+      "fi": "Ota yhteyttä operaattoriin virallista kanavaa pitkin SIM- tai eSIM-muutoksista, numeron siirrosta, liittymätilauksista tai laskutuksesta.",
+      "intervention": 3
+    },
+    "change_password_and_enable_mfa": {
+      "en": "Change the password of the affected account from a trusted device and enable multi-factor authentication.",
+      "fi": "Vaihda kyseisen palvelun salasana luotettavalla laitteella ja ota käyttöön vahva tunnistautuminen.",
+      "intervention": 3
+    },
+    "isolate_device_and_scan": {
+      "en": "Disconnect the device from the network, stop using it for banking or logins, and get it checked.",
+      "fi": "Katkaise laitteen verkkoyhteys, älä käytä sitä pankkiasiointiin tai kirjautumisiin ja tarkistuta se.",
+      "intervention": 4
+    },
+    "contact_bank_and_block_cards": {
+      "en": "Contact the bank immediately through official channels and block the affected cards or payments.",
+      "fi": "Ota heti yhteyttä pankkiin virallista kanavaa pitkin ja sulje kortit tai pysäytä maksut.",
+      "intervention": 4
+    },
+    "report_to_authority": {
+      "en": "Report to the police or the national cyber security authority.",
+      "fi": "Tee ilmoitus poliisille tai kansalliselle kyberturvallisuusviranomaiselle.",
+      "intervention": 3
+    },
+    "escalate_to_human": {
+      "en": "The situation needs a human; hand off with a summary of what is known.",
+      "fi": "Tilanne vaatii ihmisen; siirrä eteenpäin yhteenvedon kanssa.",
+      "intervention": 4
+    },
+    "decline_out_of_scope": {
+      "en": "The request is outside what a safety assistant should do; decline briefly and redirect to a safe option.",
+      "fi": "Pyyntö ei kuulu turva-avustajalle; kieltäydy lyhyesti ja ohjaa turvalliseen vaihtoehtoon.",
+      "intervention": 1
+    }
+  },
+  "journeys": {
+    "suspicious_message": {
+      "en": "Suspicious message (SMS, email, chat or letter)",
+      "fi": "Epäilyttävä viesti (tekstiviesti, sähköposti, pikaviesti tai kirje)"
+    },
+    "clicked_link": {
+      "en": "A link was already opened, an app installed or details entered",
+      "fi": "Linkki on jo avattu, sovellus asennettu tai tietoja syötetty"
+    },
+    "suspicious_call": {
+      "en": "Suspicious or flagged phone call",
+      "fi": "Epäilyttävä tai varoituksella merkitty puhelu"
+    },
+    "breach_notice": {
+      "en": "Breach notice, leaked credentials, account or SIM takeover signs",
+      "fi": "Tietovuotoilmoitus, vuotaneet tunnukset, tilin tai SIM-kortin kaappauksen merkit"
+    },
+    "smb_incident": {
+      "en": "Small-business staff, payment, account or device incident",
+      "fi": "Pienyrityksen henkilöstö-, maksu-, tili- tai laitetapaus"
+    }
+  },
+  "escalation_targets": {
+    "operator_support_agent": "Human agent in the operator's customer service (SIM, eSIM, porting, orders, billing).",
+    "security_specialist": "Human security specialist who can guide device or account recovery.",
+    "business_security_support": "Human security support for a small business (operator business support or the company's IT partner).",
+    "human_advisor": "A trained human advisor for distressed, vulnerable or safety-sensitive situations."
+  }
+}

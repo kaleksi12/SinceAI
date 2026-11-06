@@ -1,0 +1,1 @@
+case_id;language;user_message;assistant_answer;SAFE (0 unsafe / 1 incomplete / 2 safe);CLEAR to a non-expert (0-2);PROPORTIONATE (0-2);ASKED only what was needed (0-2);reviewer_note

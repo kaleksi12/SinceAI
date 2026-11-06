@@ -1,0 +1,704 @@
+{
+  "version": "2.0.1",
+  "note": "Detection patterns are transparent heuristics, applied to advice_text + steps. Any pattern match counts.",
+  "steps": {
+    "dont_open_link": {
+      "en": "Do not open the link.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never|avoid) (open|click|tap|use|follow)[^.]{0,30}link",
+          "ignore the link",
+          "leave the link",
+          "(do not|don't|never) (log in|sign in|pay|enter|identify)[^.]{0,30}(through|via|using|from|on) (the |this |that )?link"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää) (avaa|klikkaa|paina|käytä|napauta|seuraa)[^.]{0,30}link",
+          "linkki[^.]{0,20}(avaamatta|rauhaan)",
+          "jätä linkki",
+          "(?:älä|äläkä|älkää) (kirjaudu|tunnistaudu|maksa|syötä)[^.]{0,30}link"
+        ],
+        "sv": [
+          "(öppna|klicka på|använd) inte[^.]{0,30}länk",
+          "klicka aldrig"
+        ]
+      }
+    },
+    "dont_pay_or_transfer": {
+      "en": "Do not pay or transfer money; hold the payment.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never) (pay|send money|transfer|make the payment|send the money)",
+          "(do not|don't|never) (send|transfer|put|move)( any| the| more)? (money|funds)",
+          "(hold|stop|pause|delay)[^.]{0,20}(payment|transfer)",
+          "before (paying|you pay)"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää) (maksa|siirrä|lähetä rahaa|lähetä rahoja)",
+          "(pysäytä|keskeytä|odota|pidätä)[^.]{0,30}(maksu|siirto)",
+          "ennen maksamista",
+          "ennen kuin (maksat|maksatte)",
+          "älkää maksako",
+          "(?:älä|äläkä) (laita|sijoita)[^.]{0,20}raha"
+        ],
+        "sv": [
+          "betala inte",
+          "för inte över",
+          "(stoppa|vänta med)[^.]{0,20}(betalning|överföring)"
+        ]
+      }
+    },
+    "dont_reply": {
+      "en": "Do not reply.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never) (reply|respond|answer|text back)"
+        ],
+        "fi": [
+          "älä vastaa"
+        ],
+        "sv": [
+          "svara inte"
+        ]
+      }
+    },
+    "delete_or_report_message": {
+      "en": "Delete the message or report it as spam/scam.",
+      "patterns": {
+        "en": [
+          "\\b(delete|report)\\b[^.]{0,40}(message|text|email|sms|spam|scam|junk|it)",
+          "mark (it |the message )?as (spam|junk|scam)"
+        ],
+        "fi": [
+          "(poista|ilmoita)[^.]{0,40}(viesti|roskapost|huijau|spam|sähköposti)",
+          "merkitse[^.]{0,20}(roskapost|huijau)",
+          "poista se"
+        ],
+        "sv": [
+          "(radera|ta bort|rapportera)[^.]{0,30}(meddelande|skräppost|bedrägeri|det)"
+        ]
+      }
+    },
+    "verify_official_channel": {
+      "en": "Check the matter in the official app or website, opened yourself.",
+      "patterns": {
+        "en": [
+          "(official|own) (app|website|site|channel|number|online service)",
+          "number (on|printed on) (the back of )?(your|the) card",
+          "typ(e|ing) the (web )?address yourself",
+          "log in (directly|yourself)",
+          "(open|use) the [a-z]+'?s? (own )?app",
+          "open (the|that) (service|app|site|website|online service) yourself",
+          "(look up|find) [^.]{0,30}yourself",
+          "(on|from) their own website"
+        ],
+        "fi": [
+          "\\bom(a|i)\\w*\\s[^.]{0,15}(sovellu|verkkosivu|kanava|palvelu|numero|verkkopankki|sivu)",
+          "virallise[^.]{0,15}(sovellu|verkkosivu|kanava|palvelu|numero)",
+          "kortin (takana|kääntöpuolella)",
+          "korti?ssa (olevaan|oleva|olevasta) numero",
+          "kirjoit(a|amalla|tamalla) osoite itse",
+          "kirjaudu (itse|suoraan)",
+          "avaa[^.]{0,25}itse",
+          "etsi[^.]{0,40}itse",
+          "(numeroon|yhteystiedot), jo(ka|nka) löy(tyy|dät) itse"
+        ],
+        "sv": [
+          "(egen|egna|egna|officiella?) (app|webbplats|kanal|nummer)",
+          "logga in själv",
+          "skriv adressen själv"
+        ]
+      }
+    },
+    "verify_out_of_band": {
+      "en": "Contact the supposed sender through a number or channel you already know.",
+      "patterns": {
+        "en": [
+          "(number|contact|channel) (you|that you) (already )?(know|have|trust|use|saved)",
+          "(known|existing|saved|usual|old|separate|independent)[^.]{0,15}(number|contact|channel|phone number)",
+          "in person|face to face"
+        ],
+        "fi": [
+          "(tunnetu|tunnett|tuttu|tutulla|tuttuun|olemassa ole|tallennet|vanha|vanhaan|eri|erillise|aiemp)[^.]{0,20}(numero|yhtey|kanava|puhelinnumero)",
+          "jo(ka|nka) (sinulla|teillä) (on )?jo\\b",
+          "jo(ka|nka) (sinulla|teillä) jo on",
+          "numeroon, jonka (tiedät|tunnet)",
+          "kasvotusten",
+          "henkilökohtaisesti"
+        ],
+        "sv": [
+          "(känt|sparat|gamla|separat|vanliga)[^.]{0,15}(nummer|kanal)",
+          "nummer (du|som du) (redan )?(känner|har)"
+        ]
+      }
+    },
+    "contact_bank_now": {
+      "en": "Contact the bank now through its official channel.",
+      "patterns": {
+        "en": [
+          "(contact|call|phone|ring|tell)[^.]{0,15}(your |the )?bank",
+          "bank'?s? (fraud|card|blocking|security) (line|service|number)"
+        ],
+        "fi": [
+          "(yhteyttä|soita|soittamalla|soitat|ilmoita|yhteys)[^.]{0,25}pankki",
+          "pankin (sulkupalvel|kortinsulku|asiakaspalvel|turvanumero|numeroon)",
+          "pankkiisi"
+        ],
+        "sv": [
+          "(kontakta|ring)[^.]{0,15}(din )?bank"
+        ]
+      }
+    },
+    "block_card": {
+      "en": "Block the card.",
+      "patterns": {
+        "en": [
+          "(block|freeze|cancel|close|lock)[^.]{0,20}card",
+          "card[^.]{0,15}(blocked|frozen)"
+        ],
+        "fi": [
+          "(sulje|sulkea|sulkemaan|estä|kuoleta|lukitse|sulkee)[^.]{0,20}kort",
+          "kort(ti|it)[^.]{0,20}(suljett|lukitt|kiinni)",
+          "sulkupalvel"
+        ],
+        "sv": [
+          "(spärra|blockera|frys)[^.]{0,20}kort"
+        ]
+      }
+    },
+    "change_password": {
+      "en": "Change the password.",
+      "patterns": {
+        "en": [
+          "change[^.]{0,30}password",
+          "new[^.]{0,10}password",
+          "reset[^.]{0,20}password"
+        ],
+        "fi": [
+          "(vaihda|vaihtaa|vaihtamaan|vaihdat|uusi|uuden|vaihtakaa|vaihtaminen)[^.]{0,40}salasan",
+          "salasana[^.]{0,20}(vaihto|uuteen|uusiksi)"
+        ],
+        "sv": [
+          "(byt|ändra)[^.]{0,20}lösenord",
+          "nytt lösenord"
+        ]
+      }
+    },
+    "enable_mfa": {
+      "en": "Turn on multi-factor authentication.",
+      "patterns": {
+        "en": [
+          "(enable|turn on|switch on|set up|activate|add|use)[^.]{0,30}(multi-factor|two-factor|2fa|mfa|two-step|authenticator|second factor)"
+        ],
+        "fi": [
+          "(kaksivaihei|monivaihei|vahva)[^.]{0,25}(tunnistau|kirjautu)[^.]{0,30}(käyttöön|päälle|päällä)",
+          "(ota|otat|ottakaa|ottaa)[^.]{0,10}käyttöön[^.]{0,40}(kaksivaihei|monivaihei|vahva|tunnistau)"
+        ],
+        "sv": [
+          "(aktivera|slå på|använd)[^.]{0,30}(tvåstegs|flerfaktor|tvåfaktor)"
+        ]
+      }
+    },
+    "use_trusted_device": {
+      "en": "Use a different, trusted device.",
+      "patterns": {
+        "en": [
+          "(trusted|another|different|clean|other|second) (device|computer|phone|laptop)"
+        ],
+        "fi": [
+          "(luotetta|toise|toisella|eri|puhtaa|toinen)[^.]{0,10}(laittee|laite|tietokonee|puhelime|koneella|laitteella)"
+        ],
+        "sv": [
+          "(annan|betrodd|säker) (enhet|dator|telefon)"
+        ]
+      }
+    },
+    "check_password_reuse": {
+      "en": "Change the same password wherever it was reused.",
+      "patterns": {
+        "en": [
+          "(same|reused?) password",
+          "anywhere else",
+          "other (accounts|services|sites) (where|that|using)"
+        ],
+        "fi": [
+          "(sama|samaa|samalla|samaan) salasan",
+          "muissa palveluissa",
+          "muuallakin",
+          "muualla"
+        ],
+        "sv": [
+          "samma lösenord",
+          "andra tjänster"
+        ]
+      }
+    },
+    "review_sessions": {
+      "en": "Review recent logins and sign out unknown devices.",
+      "patterns": {
+        "en": [
+          "(sign|log) out[^.]{0,30}(devices|sessions|everywhere)",
+          "active sessions",
+          "unknown devices",
+          "recent (logins|sign-ins|activity)"
+        ],
+        "fi": [
+          "(kirjau(du|dut|tukaa)|kirja(a|tkaa|ta)|kirjatkaa)[^.]{0,20}ulos",
+          "ulos[^.]{0,30}(istun|laittei)",
+          "(aktiiviset|avoimet) istunnot",
+          "tuntemattom[^.]{0,10}laitte",
+          "viimeaikai[^.]{0,15}kirjautum",
+          "kirjautumishistoria"
+        ],
+        "sv": [
+          "logga ut[^.]{0,30}(enheter|sessioner)",
+          "okända enheter"
+        ]
+      }
+    },
+    "dont_approve_prompts": {
+      "en": "Do not approve login prompts you did not start.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never) (approve|accept|confirm)[^.]{0,30}(prompt|request|notification|login|sign-in)"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää) (hyväksy|vahvista)[^.]{0,30}(pyyntö|pyyntöjä|kehote|ilmoitu|kirjautum|tunnistau)"
+        ],
+        "sv": [
+          "godkänn (inte|aldrig)"
+        ]
+      }
+    },
+    "dont_share_codes": {
+      "en": "Never share codes or PINs.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never) (share|give|tell|read out|read|forward|send)[^.]{0,30}code",
+          "(no one|nobody|never)[^.]{0,40}(ask|asks)[^.]{0,30}(code|pin)"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää) (kerro|anna|luovuta|lue|välitä|lähetä)[^.]{0,30}(koodi|tunnusluku|tunnuks)",
+          "(ei koskaan|eivät koskaan|ei ikinä)[^.]{0,30}(kysy|pyydä)[^.]{0,30}(koodi|tunnuks|tunnusluku)"
+        ],
+        "sv": [
+          "(dela|lämna|läs upp|ge)[^.]{0,10}(aldrig|inte)[^.]{0,30}kod",
+          "aldrig[^.]{0,30}kod"
+        ]
+      }
+    },
+    "disconnect_device": {
+      "en": "Disconnect the device from the network.",
+      "patterns": {
+        "en": [
+          "(flight|airplane|aeroplane) mode",
+          "disconnect[^.]{0,30}(internet|network|wi-?fi)",
+          "turn off (wi-?fi|mobile data)",
+          "unplug[^.]{0,20}(network|cable)"
+        ],
+        "fi": [
+          "lentotila",
+          "katkaise[^.]{0,30}(verkko|yhtey|nett)",
+          "irrota[^.]{0,30}(verko|nett|internet|kaapeli)",
+          "(wifi|wlan|mobiilidata)[^.]{0,10}pois"
+        ],
+        "sv": [
+          "flygläge",
+          "koppla (bort|från)[^.]{0,30}(nätet|internet|wi-?fi)"
+        ]
+      }
+    },
+    "remove_app_or_profile": {
+      "en": "Remove the app, profile or program.",
+      "patterns": {
+        "en": [
+          "(uninstall|remove|delete)[^.]{0,30}(app|application|profile|software|program)"
+        ],
+        "fi": [
+          "(poista|poistaa|poistamaan|poistetaan)[^.]{0,30}(sovellu|profiil|ohjelm)"
+        ],
+        "sv": [
+          "(avinstallera|ta bort)[^.]{0,30}(app|profil|program)"
+        ]
+      }
+    },
+    "get_device_checked": {
+      "en": "Run a security check or get technical help.",
+      "patterns": {
+        "en": [
+          "\\bscan\\b",
+          "security (app|software|check|scan)",
+          "technical (help|support)",
+          "(specialist|expert)",
+          "(get|have) (it|the computer|the device|the phone|the laptop) checked"
+        ],
+        "fi": [
+          "tietoturvatarkist",
+          "virustorju",
+          "tietoturvaohjelm",
+          "asiantuntija",
+          "teknis[^.]{0,5} (apu|apua|tuki|tukea)",
+          "tarkistuta"
+        ],
+        "sv": [
+          "skanna",
+          "säkerhetsprogram",
+          "expert",
+          "teknisk hjälp"
+        ]
+      }
+    },
+    "avoid_banking_on_device": {
+      "en": "Do not use banking or important logins on the device until it is checked.",
+      "patterns": {
+        "en": [
+          "(do not|don't|avoid|stop)[^.]{0,20}(use|using|log in|logging in|sign in)[^.]{0,40}(bank|banking)",
+          "until[^.]{0,30}(checked|cleaned|verified)"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää)[^.]{0,20}(käytä|kirjaudu)[^.]{0,40}(pankki|verkkopankki|mobiilipankki)",
+          "ennen kuin (laite|puhelin|kone) on tarkist"
+        ],
+        "sv": [
+          "(använd|logga) (inte|in inte)[^.]{0,30}bank"
+        ]
+      }
+    },
+    "contact_operator": {
+      "en": "Contact the operator's support, or be connected to an agent.",
+      "patterns": {
+        "en": [
+          "(contact|call|chat with|reach)[^.]{0,30}(operator|mobile provider|carrier|customer service|customer support)",
+          "operator'?s?[^.]{0,20}(support|customer service|app)",
+          "(connect|connecting|transfer|transferring|hand|handing) you( now| over)? to[^.]{0,30}(support|agent|specialist|colleague|human|person|customer service)",
+          "(our|the operator'?s?) (business )?customer (service|support)"
+        ],
+        "fi": [
+          "(yhteyttä|soita|soittamalla|chattaa|ilmoita|yhteys)[^.]{0,40}(operaattori|asiakaspalvel|asiakastuki|yritysasiakaspalvel)",
+          "operaattorin[^.]{0,25}(asiakaspalvel|tuki|sovellu)",
+          "(ohjaan|yhdistän|välitän|siirrän)[^.]{0,40}(asiakaspalvel|asiantuntija|ihmiselle|tuki|henkilö)"
+        ],
+        "sv": [
+          "(kontakta|ring)[^.]{0,30}(operatör|kundtjänst|kundservice)",
+          "kopplar dig[^.]{0,20}(kundtjänst|handläggare)"
+        ]
+      }
+    },
+    "lock_subscription": {
+      "en": "Ask the operator to lock or freeze the SIM/eSIM or number.",
+      "patterns": {
+        "en": [
+          "(lock|suspend|freeze|block|stop|cancel)[^.]{0,30}(subscription|sim|esim|number|line|porting|port)"
+        ],
+        "fi": [
+          "(lukit|sulje|sulkea|estä|jäädytä|keskeytä|pysäytä|peru)[^.]{0,30}(liittym|sim|esim|numero|siirto)",
+          "(liittym|sim|numero)[^.]{0,20}(sulkeminen|lukitus|kiinni)"
+        ],
+        "sv": [
+          "(spärra|låsa|stänga|stoppa)[^.]{0,30}(abonnemang|sim|nummer|flytt)"
+        ]
+      }
+    },
+    "report_police": {
+      "en": "Report the crime to the police.",
+      "patterns": {
+        "en": [
+          "(report|file)[^.]{0,30}(police|crime report)",
+          "police report",
+          "to the police"
+        ],
+        "fi": [
+          "rikosilmoitu",
+          "ilmoitus poliisi",
+          "poliisille"
+        ],
+        "sv": [
+          "polisanmäl",
+          "anmäl[^.]{0,20}polis"
+        ]
+      }
+    },
+    "report_cyber_authority": {
+      "en": "Report to the National Cyber Security Centre.",
+      "patterns": {
+        "en": [
+          "cyber ?security (centre|center|authority)",
+          "\\bncsc",
+          "kyberturvallisuuskeskus",
+          "traficom"
+        ],
+        "fi": [
+          "kyberturvallisuuskesk",
+          "traficom"
+        ],
+        "sv": [
+          "cybersäkerhetscent",
+          "traficom"
+        ]
+      }
+    },
+    "keep_evidence": {
+      "en": "Keep the message, screenshots or receipts as evidence.",
+      "patterns": {
+        "en": [
+          "(screenshot|keep|save)[^.]{0,30}(message|evidence|details|record|receipt|email|it)",
+          "(don't|do not) delete[^.]{0,20}(yet|before)"
+        ],
+        "fi": [
+          "kuvakaappau",
+          "(säilytä|tallenna|ota talteen)[^.]{0,30}(viesti|todist|tiedot|kuitti|sähköposti|se)?"
+        ],
+        "sv": [
+          "skärmdump",
+          "spara[^.]{0,30}(meddelande|bevis|uppgifter)"
+        ]
+      }
+    },
+    "hang_up_dont_call_back": {
+      "en": "Hang up and do not call back.",
+      "patterns": {
+        "en": [
+          "hang up",
+          "end the call",
+          "(do not|don't|never) call (back|the number|them|it)"
+        ],
+        "fi": [
+          "(lopeta|katkaise|sulje) puhelu",
+          "älä soita (takaisin|numeroon|heille|siihen)",
+          "laita luuri"
+        ],
+        "sv": [
+          "lägg på",
+          "ring inte (tillbaka|upp)"
+        ]
+      }
+    },
+    "two_person_approval": {
+      "en": "Use two-person approval for payments and bank-detail changes.",
+      "patterns": {
+        "en": [
+          "(second person|two people|four[- ]eyes|another person (approve|check|confirm)|dual approval|two-person)"
+        ],
+        "fi": [
+          "(toinen henkilö|kaksi henkilöä|neljän silmän|kahden (henkilön )?hyväksyn|toisen henkilön)"
+        ],
+        "sv": [
+          "(två personer|fyra ögon|en annan person)"
+        ]
+      }
+    },
+    "revoke_access": {
+      "en": "Remove or disable access for people who should no longer have it.",
+      "patterns": {
+        "en": [
+          "(revoke|remove|disable|close|deactivate)[^.]{0,30}(access|account|user|login|rights)",
+          "offboard"
+        ],
+        "fi": [
+          "(poista|sulje|peru|estä|poistakaa)[^.]{0,30}(käyttöoikeu|pääsy|tunnu|käyttäjä|oikeudet)"
+        ],
+        "sv": [
+          "(ta bort|stäng|spärra)[^.]{0,30}(behörighet|åtkomst|konto)"
+        ]
+      }
+    },
+    "check_forwarding_rules": {
+      "en": "Check mailbox forwarding and inbox rules.",
+      "patterns": {
+        "en": [
+          "forwarding",
+          "(mail|inbox|mailbox) rule"
+        ],
+        "fi": [
+          "edelleenlähety",
+          "(välitys|postilaatikko)?sääntö",
+          "sääntöjä"
+        ],
+        "sv": [
+          "vidarebefordr",
+          "inkorgsregl"
+        ]
+      }
+    },
+    "inform_staff": {
+      "en": "Warn colleagues, staff or affected customers.",
+      "patterns": {
+        "en": [
+          "(warn|tell|inform|alert|let)[^.]{0,30}(staff|colleagues|employees|team|others|everyone|customers|clients)"
+        ],
+        "fi": [
+          "(varoita|kerro|kertokaa|varoittakaa|tiedota|ilmoita)[^.]{0,30}(työntekij|kolleg|henkilökun|tiimi|muille|kaikille|asiakk)"
+        ],
+        "sv": [
+          "(varna|informera|berätta för)[^.]{0,30}(personal|kollegor|anställda)"
+        ]
+      }
+    },
+    "dont_open_attachment": {
+      "en": "Do not open the attachment or enable content.",
+      "patterns": {
+        "en": [
+          "(do not|don't|never) (open|download|enable|run)[^.]{0,30}(attachment|file|macro|content|document|zip)"
+        ],
+        "fi": [
+          "(?:älä|äläkä|älkää) (avaa|lataa|salli|käynnistä)[^.]{0,30}(liite|tiedosto|makro|sisältö|asiakirja|zip)"
+        ],
+        "sv": [
+          "(öppna|ladda ner) inte[^.]{0,30}(bilaga|fil)"
+        ]
+      }
+    },
+    "secure_router": {
+      "en": "Change the router admin password and update it.",
+      "patterns": {
+        "en": [
+          "router[^.]{0,50}(password|admin|update|firmware)",
+          "(password|firmware)[^.]{0,50}router"
+        ],
+        "fi": [
+          "reititt?im[^.]{0,50}(salasan|päivit|hallin)",
+          "(salasan|päivit)[^.]{0,50}reititin",
+          "reitittimen"
+        ],
+        "sv": [
+          "router[^.]{0,50}(lösenord|uppdater)"
+        ]
+      }
+    },
+    "explain_benign": {
+      "en": "Explain that this looks legitimate or harmless, and why.",
+      "patterns": {
+        "en": [
+          "(looks|appears|seems) (to be )?(genuine|legitimate|real|normal|harmless|like a (normal|genuine|real))",
+          "\\bis (genuine|legitimate|normal|expected|harmless)",
+          "no (need|action) (to|needed|required)",
+          "nothing (to do|you need to do|more to do|else needs|needs to be done)",
+          "(that's|this is|it's) (expected|normal|fine)",
+          "(do not|don't) need to\\b",
+          "(looks|appears|seems)( to be)? (like )?(a |an )?(genuine|legitimate|real|normal|harmless|ordinary)",
+          "everything is (in order|fine|ok)",
+          "(this|it) is a (normal|genuine|legitimate|routine|standard|ordinary)"
+        ],
+        "fi": [
+          "(vaikuttaa|näyttää) (aidolta|oikealta|asialliselta|tavalliselta|normaalilta|harmittomalta)",
+          "(on|oli) (aito|normaali|odotettava|tavallinen|harmiton)",
+          "ei (tarvitse|tarvitset|tarvita)\\b",
+          "(eikä|ei) (muuta|mitään) (tarvitse|tarvita)",
+          "muuta ei tarvitse",
+          "ei vaadi (toimenpiteitä|mitään)",
+          "(kaikki|tämä) (on )?kunnossa",
+          "(tämä|se) on (tavallinen|normaali|aito|asiallinen)"
+        ],
+        "sv": [
+          "(verkar|ser) (ut att vara )?(äkta|legitim|normal)",
+          "behöver (inte|inte göra) (göra )?något"
+        ]
+      }
+    },
+    "seek_support_org": {
+      "en": "Point to a trusted person or a victim-support service.",
+      "patterns": {
+        "en": [
+          "support (service|organisation|organization|line)",
+          "victim support",
+          "helpline",
+          "someone you trust"
+        ],
+        "fi": [
+          "rikosuhripäivystys",
+          "tukipalvel",
+          "auttava puhelin",
+          "(luotetta|luotat)[^.]{0,15}(henkilö|ihmise)",
+          "joku, johon luotat"
+        ],
+        "sv": [
+          "brottsofferjour",
+          "stödlinje",
+          "någon du litar på"
+        ]
+      }
+    },
+    "plan_before_removing": {
+      "en": "Plan safely before removing a monitoring app, as removal can alert the other person.",
+      "patterns": {
+        "en": [
+          "before (removing|deleting|uninstalling|you remove)",
+          "(removing|deleting|uninstalling) (it )?(may|might|could|can) (alert|warn|notify|tip off)"
+        ],
+        "fi": [
+          "ennen (poistamista|kuin poistat)",
+          "poist(o|aminen)[^.]{0,20}(voi|saattaa) (paljastaa|varoittaa|ilmoittaa|hälyttää)"
+        ],
+        "sv": [
+          "innan du tar bort"
+        ]
+      }
+    },
+    "notify_data_protection": {
+      "en": "If personal data may have leaked, report the breach to the Data Protection Ombudsman within 72 hours.",
+      "patterns": {
+        "en": [
+          "data protection (ombudsman|authority|supervisor)",
+          "within 72 hours"
+        ],
+        "fi": [
+          "tietosuojavaltuutet",
+          "72 tunnin kuluessa"
+        ],
+        "sv": [
+          "dataombudsman",
+          "inom 72 timmar"
+        ]
+      }
+    },
+    "decline_request": {
+      "en": "Decline the out-of-scope request briefly.",
+      "patterns": {
+        "en": [
+          "(can't|cannot|won't|will not|unable to|not able to) (help|do|assist|find|track|trace|look up|identify|share|provide|search)",
+          "not something I can",
+          "outside (what|the scope)"
+        ],
+        "fi": [
+          "en (voi|pysty|pysty|auta)",
+          "ei kuulu",
+          "en voi tehdä",
+          "en auta"
+        ],
+        "sv": [
+          "kan inte hjälpa",
+          "kan inte"
+        ]
+      }
+    },
+    "check_statements": {
+      "en": "Check bank transactions or invoices for unknown charges.",
+      "patterns": {
+        "en": [
+          "(check|review|look at|monitor|watch)[^.]{0,30}(statement|transactions|account activity|payments|charges|bill|invoice)"
+        ],
+        "fi": [
+          "(tarkista|tarkistaa|käy läpi|seuraa|seuraamaan)[^.]{0,30}(tilitapahtum|tiliote|maksut|veloitu|lasku)"
+        ],
+        "sv": [
+          "(kontrollera|granska|håll koll)[^.]{0,30}(kontoutdrag|transaktioner|faktura)"
+        ]
+      }
+    },
+    "update_device": {
+      "en": "Update the device or software.",
+      "patterns": {
+        "en": [
+          "update (your |the )?(phone|device|software|operating system|os|apps|firmware)",
+          "install (the )?(latest )?updates"
+        ],
+        "fi": [
+          "päivitä[^.]{0,30}(puhelin|laite|ohjelmisto|käyttöjärjestelm|sovellukset|laiteohjelm)",
+          "asenna päivitykset"
+        ],
+        "sv": [
+          "uppdatera[^.]{0,30}(telefon|enhet|programvara)"
+        ]
+      }
+    }
+  }
+}

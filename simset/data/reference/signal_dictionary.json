@@ -1,0 +1,61 @@
+{
+  "version": "2.0.1",
+  "signals": {
+    "artifact": {
+      "consent": "visible",
+      "en": "The message, call, letter or notice the user is asking about, as the user shared it."
+    },
+    "link_check": {
+      "consent": "visible",
+      "en": "Simulated link-reputation result for a link the user shared."
+    },
+    "call_warning": {
+      "consent": "visible",
+      "en": "Simulated network call warning that was shown to the user during the call."
+    },
+    "user_call_notes": {
+      "consent": "visible",
+      "en": "Notes the user typed about a call. No recordings exist."
+    },
+    "subscription.products": {
+      "consent": "visible",
+      "en": "The identified customer's subscriptions (operator's own service context)."
+    },
+    "subscription.recent_events": {
+      "consent": "requires_consent",
+      "en": "Recent SIM/eSIM, porting, order and billing events on the subscription, with the channel and how the requester was authenticated (the operator knows how a request was authenticated, not whether the real customer made it)."
+    },
+    "subscription.network_status": {
+      "consent": "requires_consent",
+      "en": "Whether the user's line currently has network service."
+    },
+    "device.summary": {
+      "consent": "visible",
+      "en": "Platform, OS version and patch status of the device the user is chatting from."
+    },
+    "device.recent_app_installs": {
+      "consent": "requires_consent",
+      "en": "Apps installed in the last 14 days, with source and granted permissions. Assumes an optional operator security app on Android or Windows; null on iOS, where apps cannot inspect other apps."
+    },
+    "device.security_findings": {
+      "consent": "requires_consent",
+      "en": "Findings from the same optional security app (remote-access apps, accessibility services). Null on iOS."
+    },
+    "operator_account.recent_logins": {
+      "consent": "requires_consent",
+      "en": "Recent logins to the user's operator account (time, country, known device)."
+    },
+    "credential_exposure": {
+      "consent": "requires_consent",
+      "en": "Result of an optional breach-monitoring check for the user's email address."
+    },
+    "business.profile": {
+      "consent": "visible",
+      "en": "Company size, roles and admin set-up as known to the operator's business service."
+    },
+    "business.staff_accounts": {
+      "consent": "requires_consent",
+      "en": "Business user list with last activity, for small-business admins only."
+    }
+  }
+}

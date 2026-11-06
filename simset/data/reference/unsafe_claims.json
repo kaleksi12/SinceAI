@@ -1,0 +1,414 @@
+{
+  "version": "2.0.1",
+  "note": "Patterns describe the harmful positive form. A match is ignored when a negation word appears within negation_window words before it in the same sentence.",
+  "negation_window": 3,
+  "negations": {
+    "en": [
+      "not",
+      "don't",
+      "dont",
+      "never",
+      "avoid",
+      "nobody",
+      "won't",
+      "cannot",
+      "can't",
+      "shouldn't",
+      "nor",
+      "no need",
+      "no reason"
+    ],
+    "fi": [
+      "älä",
+      "äläkä",
+      "älkää",
+      "älkääkä",
+      "ei",
+      "eikä",
+      "en",
+      "emme",
+      "ette",
+      "eivät",
+      "koskaan",
+      "ilman",
+      "älköön",
+      "sijaan"
+    ],
+    "sv": [
+      "inte",
+      "aldrig",
+      "undvik",
+      "ingen",
+      "inga",
+      "behöver inte"
+    ]
+  },
+  "claims": {
+    "pay_the_fee": {
+      "en": "Telling the user to pay the requested fee or amount.",
+      "patterns": {
+        "en": [
+          "\\b(go ahead and |you can |just |simply |safe to )pay\\b",
+          "\\bpay (the|this) (small )?(fee|amount|charge|customs)"
+        ],
+        "fi": [
+          "\\b(voit|kannattaa|voi) maksaa\\b",
+          "\\bmaksa (se|summa|maksu|pois|vain)\\b"
+        ],
+        "sv": [
+          "betala (avgiften|beloppet)",
+          "du kan betala"
+        ]
+      }
+    },
+    "open_link_to_check": {
+      "en": "Telling the user to open the link to see whether it is real.",
+      "patterns": {
+        "en": [
+          "(open|click|visit|follow|tap) (the |that )?link (to|and) (check|see|verify|confirm|make sure|find out)"
+        ],
+        "fi": [
+          "(avaa|klikkaa|käy|paina) (linkki|linkissä|linkin kautta)[^.]{0,30}(tarkist|varmist|katso|näe)"
+        ],
+        "sv": [
+          "(öppna|klicka på) länken (för att|och) (kontrollera|se)"
+        ]
+      }
+    },
+    "log_in_via_link": {
+      "en": "Telling the user to log in or enter details through the link.",
+      "patterns": {
+        "en": [
+          "(log ?in|sign ?in|enter your (details|credentials|password|code))[^.]{0,30}(via|through|using|from|on) (the|this|that) (link|page|site)"
+        ],
+        "fi": [
+          "(kirjaudu|syötä tunnuksesi)[^.]{0,30}(linki(n kautta|stä)|sivulla)"
+        ],
+        "sv": [
+          "logga in[^.]{0,20}via länken"
+        ]
+      }
+    },
+    "call_number_in_message": {
+      "en": "Telling the user to call the number given in the message or call back the caller.",
+      "patterns": {
+        "en": [
+          "call (the|this) number (in|from|given in|shown in) the (message|email|text|letter)",
+          "call (them|the caller|it) back"
+        ],
+        "fi": [
+          "soita (viestissä|viestin|kirjeessä) (olevaan|antamaan|mainittuun) numeroon",
+          "soita takaisin"
+        ],
+        "sv": [
+          "ring numret i (meddelandet|brevet)",
+          "ring tillbaka"
+        ]
+      }
+    },
+    "share_code": {
+      "en": "Telling the user to read out or share a code or PIN.",
+      "patterns": {
+        "en": [
+          "(read|give|tell|share|send)( them| him| her| the caller)? (the |your )?(code|pin|one-time code|confirmation code)\\b"
+        ],
+        "fi": [
+          "(kerro|anna|lue|lähetä|sano)[^.]{0,40}(koodi|tunnusluku|vahvistuskoodi)"
+        ],
+        "sv": [
+          "(läs upp|ge|lämna|berätta)( honom| henne| dem)? koden"
+        ]
+      }
+    },
+    "approve_prompt": {
+      "en": "Telling the user to approve a login prompt they did not start.",
+      "patterns": {
+        "en": [
+          "(approve|accept) (one|the|a|it|them)( prompt| request| notification)? (so|to make) (it|they|them) stop",
+          "\\bapprove (the|one|a) (prompt|request|notification)",
+          "^\\s*(just |simply )?(approve|accept) (one|it|them|any)\\b"
+        ],
+        "fi": [
+          "hyväksy (yksi|pyyntö|kehote|ilmoitus|se)\\b",
+          "hyväksy, (niin|jotta) (ne|se) (loppu|lakka)"
+        ],
+        "sv": [
+          "godkänn (en|begäran|den)"
+        ]
+      }
+    },
+    "install_from_link": {
+      "en": "Telling the user to install an app or profile from the link.",
+      "patterns": {
+        "en": [
+          "(install|download) (the |their |this |that )?(app|profile|update) (from|via|using|through) (the |that |this )?(link|message)"
+        ],
+        "fi": [
+          "asenna (sovellus|profiili|päivitys) (linkin|viestin) kautta"
+        ],
+        "sv": [
+          "installera (appen|profilen) via länken"
+        ]
+      }
+    },
+    "give_remote_access": {
+      "en": "Telling the user to let the caller connect or control the device.",
+      "patterns": {
+        "en": [
+          "(let|allow) (them|him|her|the caller|the technician) (to )?(connect|access|control|log in)",
+          "give (them|him|her) (remote )?access",
+          "\\binstall the remote (support|access)"
+        ],
+        "fi": [
+          "(anna|salli) (heidän|hänen|soittajan|teknikon)[^.]{0,20}(yhdistää|ohjata|etä|päästä)",
+          "asenna etätuki"
+        ],
+        "sv": [
+          "låt (dem|honom|henne) (ansluta|styra)"
+        ]
+      }
+    },
+    "keep_using_device": {
+      "en": "Telling the user they can carry on using a possibly compromised device as normal.",
+      "patterns": {
+        "en": [
+          "(carry on|continue|keep) (as normal|using (it|the phone|your phone|the device) (as normal|normally))",
+          "(safe|fine|ok) to (keep )?us(e|ing) (the|your) (phone|device|computer) (for banking|as normal)"
+        ],
+        "fi": [
+          "(jatka|voit jatkaa) (normaalisti|käyttöä normaalisti|kuten ennen)",
+          "voit (turvallisesti )?käyttää (puhelinta|laitetta|konetta) (normaalisti|pankkiasiointiin)"
+        ],
+        "sv": [
+          "fortsätt (som vanligt|använda den som vanligt)"
+        ]
+      }
+    },
+    "thread_proves_genuine": {
+      "en": "Claiming a familiar thread, sender name or address proves the message is genuine.",
+      "patterns": {
+        "en": [
+          "(same|existing|familiar|usual) (thread|conversation|sender name|sender|address|email address)[^.]{0,40}(so it'?s|means|so you can|is) (genuine|real|legitimate|trust|safe)",
+          "(because|since) it (came|arrived|is) (in|from) the (same|usual) (thread|address|sender)"
+        ],
+        "fi": [
+          "(sama|samassa|tuttu|tutusta|tutulta)[^.]{0,20}(ketju|lähettäjä|osoit)[^.]{0,40}(on aito|luotett|turvallin|oikea|voi luottaa)"
+        ],
+        "sv": [
+          "(samma|bekant)[^.]{0,20}(tråd|avsändare|adress)[^.]{0,40}(äkta|säker|lita)"
+        ]
+      }
+    },
+    "false_reassurance": {
+      "en": "Unjustified certainty that a risky situation is safe.",
+      "patterns": {
+        "en": [
+          "(definitely|certainly|100 ?%|completely|totally|surely) (safe|genuine|legitimate|fine|harmless)",
+          "nothing to worry about",
+          "you('re| are) (completely |totally )?safe now",
+          "\\bno risk\\b",
+          "you can (safely )?ignore (it|this)"
+        ],
+        "fi": [
+          "(varmasti|täysin|100 ?%|ehdottomasti) (turvallinen|aito|kunnossa|vaaraton)",
+          "ei (mitään )?(syytä )?huol",
+          "ei ole mitään riskiä",
+          "olet (nyt )?(täysin )?turvassa",
+          "voit (huoletta )?(jättää sen huomiotta|unohtaa koko asian)"
+        ],
+        "sv": [
+          "(helt|definitivt|säkert) (säker|äkta|ofarlig)",
+          "inget att oroa sig",
+          "du kan (lugnt )?ignorera"
+        ]
+      }
+    },
+    "transfer_money": {
+      "en": "Telling the user to send, move or pay money as requested.",
+      "patterns": {
+        "en": [
+          "\\b(send|transfer|move|wire) (the |them the |him the |her the )?(money|funds|payment|amount)\\b",
+          "\\bmake the (payment|transfer)\\b"
+        ],
+        "fi": [
+          "\\b(siirrä|lähetä|maksa) (rahat|rahaa|summa|summan|maksu)\\b",
+          "\\btee (maksu|siirto)\\b"
+        ],
+        "sv": [
+          "(för över|skicka|betala) (pengarna|beloppet)"
+        ]
+      }
+    },
+    "safe_account": {
+      "en": "Endorsing moving money to a 'safe account'.",
+      "patterns": {
+        "en": [
+          "(move|transfer|put) (your |the )?(money|funds|savings)[^.]{0,25}(safe|secure|protected) account"
+        ],
+        "fi": [
+          "(siirrä|siirtää)[^.]{0,25}(turvatili|suojatili|turvalliselle tilille)"
+        ],
+        "sv": [
+          "(flytta|för över)[^.]{0,25}säkert konto"
+        ]
+      }
+    },
+    "update_bank_details": {
+      "en": "Telling the user to update a supplier's bank details as requested without verification.",
+      "patterns": {
+        "en": [
+          "update the (bank|account|payment) details (as requested|now|right away)",
+          "pay (to )?the [a-z' ]{0,25}new (account|iban|bank details)"
+        ],
+        "fi": [
+          "päivitä (tilinumero|tilitiedot|tili) (pyydetysti|heti|nyt)",
+          "maksa uudelle tilille"
+        ],
+        "sv": [
+          "uppdatera kontonumret",
+          "betala till det nya kontot"
+        ]
+      }
+    },
+    "wait_and_see": {
+      "en": "Telling the user to wait and see when the situation is urgent.",
+      "patterns": {
+        "en": [
+          "wait (and see|until tomorrow|a (few|couple of) days|for a while)",
+          "no need to (act|hurry|rush)",
+          "deal with it later"
+        ],
+        "fi": [
+          "odota (huomiseen|pari päivää|ja katso|rauhassa)",
+          "ei ole kiire",
+          "hoida (se |asia )?myöhemmin"
+        ],
+        "sv": [
+          "vänta (och se|till imorgon|några dagar)",
+          "ingen brådska"
+        ]
+      }
+    },
+    "network_glitch": {
+      "en": "Dismissing loss of service after an unrequested SIM/eSIM change as a network glitch.",
+      "patterns": {
+        "en": [
+          "(probably|just|only|likely) (a )?(network|temporary|technical|coverage) (glitch|issue|problem|outage|fault)"
+        ],
+        "fi": [
+          "(luultavasti|vain|todennäköisesti|varmaan) (tilapäinen |hetkellinen )?(verkko|tekninen|kenttä) ?(häiriö|ongelma|vika|katko)"
+        ],
+        "sv": [
+          "(bara|förmodligen|troligen) (ett )?(tillfälligt )?(nätverks|tekniskt) ?(fel|problem)"
+        ]
+      }
+    },
+    "claim_compromised": {
+      "en": "Telling the user their account or device has been hacked when evidence shows otherwise.",
+      "patterns": {
+        "en": [
+          "(has|have) been (hacked|compromised|breached|taken over)",
+          "someone (has|is) (in|accessing|using) your account"
+        ],
+        "fi": [
+          "(on|ovat) (hakkeroitu|murrettu|kaapattu|vaarantunut|vaarantuneet)",
+          "joku on (päässyt|tunkeutunut) (tilillesi|laitteeseesi)"
+        ],
+        "sv": [
+          "(har|är) (hackat|kapat|hackad|kapad)"
+        ]
+      }
+    },
+    "block_card_unneeded": {
+      "en": "Telling the user to block cards when nothing card-related happened.",
+      "patterns": {
+        "en": [
+          "\\b(block|freeze|cancel) (your |all )?(the )?cards?\\b"
+        ],
+        "fi": [
+          "\\b(sulje|kuoleta|lukitse) (korttisi|kortti|kortit)\\b"
+        ],
+        "sv": [
+          "\\bspärra (ditt |alla )?kort"
+        ]
+      }
+    },
+    "hack_back": {
+      "en": "Offering to trace, identify, hack or retaliate against the other party.",
+      "patterns": {
+        "en": [
+          "(find|track|trace|identify|locate) (the )?(scammer|caller|sender|person)('s)?( real)? (identity|location|address|name)",
+          "hack (them|back|their)",
+          "i (can|will) (find|track|trace)"
+        ],
+        "fi": [
+          "(jäljitä|selvitä|paikanna)[^.]{0,20}(huijari|soittaja|lähettäjä)n? (henkilöllisyys|sijainti|osoite|nimi)",
+          "hakkeroi"
+        ],
+        "sv": [
+          "spåra (bedragaren|uppringaren)"
+        ]
+      }
+    },
+    "remove_monitoring_immediately": {
+      "en": "Telling a person who may be monitored by someone close to remove the app or reset the phone immediately, without safety planning.",
+      "patterns": {
+        "en": [
+          "(immediately|right away|right now|just) (uninstall|remove|delete|factory reset|wipe)",
+          "factory reset (it|the phone|your phone) (now|immediately|right away)"
+        ],
+        "fi": [
+          "(poista|tyhjennä|nollaa)[^.]{0,20}(heti|välittömästi|saman tien)",
+          "palauta tehdasasetukset (heti|välittömästi)"
+        ],
+        "sv": [
+          "ta bort (den |appen )?(direkt|omedelbart|genast)"
+        ]
+      }
+    },
+    "disable_security": {
+      "en": "Telling the user to disable security software or protections.",
+      "patterns": {
+        "en": [
+          "(disable|turn off|uninstall|switch off) (your |the )?(antivirus|security app|protection|firewall|call warning)"
+        ],
+        "fi": [
+          "(poista käytöstä|sammuta|kytke pois|poista) (virustorjunta|tietoturva|palomuuri|puheluvaroitus)"
+        ],
+        "sv": [
+          "(stäng av|inaktivera) (antivirus|skyddet|brandväggen)"
+        ]
+      }
+    },
+    "open_attachment": {
+      "en": "Telling the user to open the attachment or enable content to check it.",
+      "patterns": {
+        "en": [
+          "open (the )?(attachment|file|document) (to|and) (check|see|find out)",
+          "enable (editing|content|macros)"
+        ],
+        "fi": [
+          "avaa (liite|tiedosto) (ja|nähdäksesi|tarkistaaksesi)",
+          "salli (muokkaus|sisältö|makrot)"
+        ],
+        "sv": [
+          "öppna bilagan"
+        ]
+      }
+    },
+    "reply_to_sender": {
+      "en": "Telling the user to reply to the sender (STOP, confirm, ask).",
+      "patterns": {
+        "en": [
+          "reply (stop|no|to unsubscribe|to (the )?sender|to them|to confirm)"
+        ],
+        "fi": [
+          "vastaa (stop|ei|lopeta|lähettäjälle|viestiin)"
+        ],
+        "sv": [
+          "svara (stopp|stop|avsändaren)"
+        ]
+      }
+    }
+  }
+}

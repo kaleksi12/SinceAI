@@ -1,0 +1,52 @@
+{
+  "en": [
+    "phishing",
+    "smishing",
+    "vishing",
+    "malware",
+    "mfa",
+    "2fa",
+    "credential",
+    "spoofing",
+    "spoofed",
+    "payload",
+    "exfiltrat",
+    "ioc",
+    "c2",
+    "ransomware",
+    "trojan",
+    "sim swap",
+    "otp",
+    "mitm",
+    "zero-day",
+    "exploit"
+  ],
+  "fi": [
+    "phishing",
+    "smishing",
+    "vishing",
+    "malware",
+    "mfa",
+    "2fa",
+    "spoofaus",
+    "spooffaus",
+    "payload",
+    "ioc",
+    "troijalai",
+    "otp",
+    "kalasteluhyökkäys",
+    "exploit",
+    "sim swap",
+    "credential"
+  ],
+  "sv": [
+    "phishing",
+    "smishing",
+    "malware",
+    "mfa",
+    "2fa",
+    "spoofing",
+    "otp",
+    "trojan"
+  ]
+}

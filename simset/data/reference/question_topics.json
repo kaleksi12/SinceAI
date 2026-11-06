@@ -1,0 +1,355 @@
+{
+  "version": "2.0.1",
+  "note": "Used by the simulator to decide what the simulated user reveals, and as the vocabulary for question_topics in submissions.",
+  "topics": {
+    "credentials_entered": {
+      "en": "Whether the user typed a username, password or login details anywhere.",
+      "patterns": {
+        "en": [
+          "\\b(enter|entered|type|typed|fill|filled|give|gave|input|put in)\\b.{0,40}\\b(password|username|user ?name|credential|login|details|id)",
+          "\\b(log|logged|sign|signed) ?in\\b",
+          "\\bpassword\\b"
+        ],
+        "fi": [
+          "(syötit|syötitkö|kirjoitit|kirjoititko|annoitko|annoit|täytit|täytitkö|kirjauduit|kirjauduitko)",
+          "tunnu(s|ks|kse)",
+          "salasan"
+        ],
+        "sv": [
+          "(skrev|fyllde|angav|loggade) (du )?(in)?",
+          "lösenord",
+          "inloggning"
+        ]
+      }
+    },
+    "card_details_entered": {
+      "en": "Whether card or payment details were entered or a payment was made.",
+      "patterns": {
+        "en": [
+          "\\bcard\\b",
+          "payment (details|info)",
+          "\\b(pay|paid)\\b"
+        ],
+        "fi": [
+          "kort(ti|in|tia|in tiedot)",
+          "maksoi(t|tko)",
+          "maksutied",
+          "maksoitko"
+        ],
+        "sv": [
+          "\\bkort",
+          "betala(de)?"
+        ]
+      }
+    },
+    "code_shared": {
+      "en": "Whether a one-time code, PIN or confirmation code was given to someone.",
+      "patterns": {
+        "en": [
+          "\\bcode",
+          "\\bpin\\b",
+          "verification number",
+          "one[- ]time"
+        ],
+        "fi": [
+          "koodi",
+          "tunnuslu",
+          "vahvistusnumero",
+          "\\bpin"
+        ],
+        "sv": [
+          "\\bkod",
+          "\\bpin"
+        ]
+      }
+    },
+    "money_transferred": {
+      "en": "Whether money was already sent, paid or moved.",
+      "patterns": {
+        "en": [
+          "\\b(transfer|transferred|sent|send|move|moved|paid)\\b.{0,25}\\b(money|funds|euros?|payment)",
+          "any money",
+          "already (paid|sent)"
+        ],
+        "fi": [
+          "(siirsit|siirsitkö|lähetit|lähetitkö|maksoit|maksoitko|maksoitteko|siirsittekö)",
+          "raha(a|t|n)"
+        ],
+        "sv": [
+          "(förde över|överförde|skickade|betalade)",
+          "pengar"
+        ]
+      }
+    },
+    "app_installed": {
+      "en": "Whether an app, profile or program was installed.",
+      "patterns": {
+        "en": [
+          "\\binstall",
+          "download(ed)?.{0,15}\\bapp",
+          "\\bprofile\\b"
+        ],
+        "fi": [
+          "asen(si|ns|nu|nettu|sit|sitko)",
+          "latasi(t|tko)",
+          "profiil"
+        ],
+        "sv": [
+          "installer",
+          "laddade ner"
+        ]
+      }
+    },
+    "remote_access_given": {
+      "en": "Whether someone was given remote access or control of the screen.",
+      "patterns": {
+        "en": [
+          "\\bremote",
+          "control (your|the) (computer|screen|phone)",
+          "screen ?shar"
+        ],
+        "fi": [
+          "etä(yhtey|käyt|tuki|ohjel)",
+          "(ruudun|näytön) ?jak",
+          "ohja(si|ta) (konetta|puhelinta)"
+        ],
+        "sv": [
+          "fjärr",
+          "skärmdelning"
+        ]
+      }
+    },
+    "link_details": {
+      "en": "The link or web address involved.",
+      "patterns": {
+        "en": [
+          "\\blink",
+          "\\burl\\b",
+          "web ?(address|site|page)",
+          "\\baddress\\b"
+        ],
+        "fi": [
+          "linkk",
+          "\\bosoit",
+          "verkkosivu",
+          "nettisivu"
+        ],
+        "sv": [
+          "länk",
+          "adress",
+          "webbplats"
+        ]
+      }
+    },
+    "call_details": {
+      "en": "Who called, what they said and what they asked for.",
+      "patterns": {
+        "en": [
+          "\\bcaller\\b",
+          "what did (they|he|she|the caller) (say|ask|want)",
+          "who (called|was it)",
+          "\\bthe call\\b"
+        ],
+        "fi": [
+          "soittaja",
+          "mitä (he|hän|soittaja) (sanoi|sanoivat|pyysi|pyysivät|halusi)",
+          "kuka soitti",
+          "puhelu(ssa|n aikana)"
+        ],
+        "sv": [
+          "vem ringde",
+          "vad sa (de|han|hon)",
+          "samtalet"
+        ]
+      }
+    },
+    "self_initiated": {
+      "en": "Whether the user started it themselves (or, in a business, a colleague did), e.g. ordered, requested or changed something.",
+      "patterns": {
+        "en": [
+          "(did|have) you.{0,30}\\b(order|request|start|initiate|ask for|change|buy|set up|reset)",
+          "was (it|this|that) you",
+          "\\byourself\\b",
+          "(did|has) (someone|anyone|a colleague).{0,30}(order|request|change)"
+        ],
+        "fi": [
+          "(tilasitko|pyysitkö|teitkö|aloititko|vaihdoitko|ostitko|tilasiko|pyysikö|teittekö|tilasitteko)",
+          "\\bitse\\b",
+          "oliko (se|tämä) sinä"
+        ],
+        "sv": [
+          "(beställde|begärde|gjorde|bytte) du",
+          "\\bsjälv"
+        ]
+      }
+    },
+    "device_behaviour": {
+      "en": "Whether the device behaves unusually (pop-ups, battery drain, unknown apps).",
+      "patterns": {
+        "en": [
+          "(phone|device|computer|laptop).{0,30}(behav|slow|strange|odd|weird|pop|battery)",
+          "anything (unusual|strange|odd)"
+        ],
+        "fi": [
+          "(puhelin|laite|kone).{0,30}(oudosti|hidas|kummallis|ponnah|akku|oudo)",
+          "mitään (outoa|erikoista)",
+          "epätavallis"
+        ],
+        "sv": [
+          "(telefonen|enheten|datorn).{0,30}(konstig|långsam|udda)"
+        ]
+      }
+    },
+    "signal_lost": {
+      "en": "Whether the phone has lost network service or calls/SMS stopped working.",
+      "patterns": {
+        "en": [
+          "\\b(signal|network|coverage|service|reception)\\b",
+          "(make|receive) (calls|texts|sms)"
+        ],
+        "fi": [
+          "kenttä",
+          "\\bverkko",
+          "signaal",
+          "puhelut .{0,10}toimi",
+          "tekstiviestit .{0,10}(tule|toimi)",
+          "yhteys (toimii|katkesi)"
+        ],
+        "sv": [
+          "täckning",
+          "\\bsignal",
+          "nätet"
+        ]
+      }
+    },
+    "account_affected": {
+      "en": "Which account or service is involved.",
+      "patterns": {
+        "en": [
+          "which (account|service|site)",
+          "what (account|service)"
+        ],
+        "fi": [
+          "(mikä|mitä|mihin|mistä) (tili|palvelu|palveluun|palvelusta|tiliin)"
+        ],
+        "sv": [
+          "vilket (konto|tjänst)"
+        ]
+      }
+    },
+    "password_reused": {
+      "en": "Whether the same password is used on other services.",
+      "patterns": {
+        "en": [
+          "(same|reuse|reused|other).{0,20}password",
+          "password.{0,30}(elsewhere|anywhere else|other (sites|services))"
+        ],
+        "fi": [
+          "sama.{0,12}salasan",
+          "salasan.{0,30}(muualla|muissa|myös)"
+        ],
+        "sv": [
+          "samma lösenord"
+        ]
+      }
+    },
+    "business_access": {
+      "en": "Who has admin rights, approves payments or still has access in the business.",
+      "patterns": {
+        "en": [
+          "(who|which people|anyone).{0,30}(access|admin|approve|rights)",
+          "\\badmin",
+          "it (support|partner)"
+        ],
+        "fi": [
+          "(kenellä|kuka|ketkä|keillä).{0,30}(oikeu|pääsy|hyväksy|ylläpi|tunnu)",
+          "ylläpitäj",
+          "it-(tuki|kumppani)"
+        ],
+        "sv": [
+          "(vem|vilka).{0,30}(behörighet|admin|godkänn)"
+        ]
+      }
+    },
+    "payment_status": {
+      "en": "Whether a business payment or invoice was already paid.",
+      "patterns": {
+        "en": [
+          "(already|been) (paid|sent|made|approved)",
+          "status of (the )?payment",
+          "(is|was|has) (the )?(payment|invoice).{0,15}(paid|sent|gone)"
+        ],
+        "fi": [
+          "(onko|ovatko|onkohan).{0,20}(maksettu|maksettiin|lähtenyt|lähetetty|hyväksytty)",
+          "maksoitteko",
+          "jo maks"
+        ],
+        "sv": [
+          "redan betal",
+          "(är|har) (fakturan|betalningen)"
+        ]
+      }
+    },
+    "user_safety": {
+      "en": "Whether the user is physically safe and whether someone close could have access to the phone.",
+      "patterns": {
+        "en": [
+          "\\bsafe\\b",
+          "\\bdanger",
+          "\\bafraid",
+          "(someone|anyone).{0,25}access to your (phone|device)"
+        ],
+        "fi": [
+          "turvassa",
+          "\\bvaara",
+          "pelk",
+          "(joku|kenellä).{0,30}(pääsy|käsiksi).{0,20}puhelim"
+        ],
+        "sv": [
+          "trygg",
+          "\\bfara",
+          "rädd"
+        ]
+      }
+    },
+    "time_of_event": {
+      "en": "When it happened.",
+      "patterns": {
+        "en": [
+          "\\bwhen\\b",
+          "how long ago",
+          "what time"
+        ],
+        "fi": [
+          "milloin",
+          "kuinka kauan",
+          "mihin aikaan",
+          "koska (tämä|se)"
+        ],
+        "sv": [
+          "\\bnär\\b",
+          "hur länge sedan"
+        ]
+      }
+    },
+    "message_content": {
+      "en": "The exact wording of the message or notice.",
+      "patterns": {
+        "en": [
+          "what (does|did) (the |that )?(message|email|text|letter|notice) say",
+          "exact (wording|text)",
+          "\\b(paste|forward|screenshot)"
+        ],
+        "fi": [
+          "mitä (viesti|viestissä|sähköposti|sähköpostissa|kirjeessä|ilmoituksessa)",
+          "viestin (sisältö|teksti)",
+          "kopioi|liitä|kuvakaappau"
+        ],
+        "sv": [
+          "vad står det",
+          "meddelandet"
+        ]
+      }
+    }
+  }
+}

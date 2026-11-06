@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sinceai.ai/schemas/dna-2026/v2/test_input.schema.json",
+  "title": "DNA Digital Security Assistant v2 - test input (no ground truth)",
+  "type": "object",
+  "required": [
+    "case_id",
+    "split",
+    "version",
+    "journey",
+    "audience",
+    "locale",
+    "language",
+    "persona",
+    "entry_point",
+    "user_identified",
+    "opening_message",
+    "signals",
+    "signal_availability",
+    "consent"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string"
+    },
+    "split": {
+      "enum": [
+        "dev",
+        "test"
+      ]
+    },
+    "version": {
+      "type": "string"
+    },
+    "journey": {
+      "enum": [
+        "suspicious_message",
+        "clicked_link",
+        "suspicious_call",
+        "breach_notice",
+        "smb_incident"
+      ]
+    },
+    "audience": {
+      "enum": [
+        "consumer",
+        "small_business"
+      ]
+    },
+    "locale": {
+      "enum": [
+        "fi-FI",
+        "en-FI",
+        "sv-FI"
+      ]
+    },
+    "language": {
+      "enum": [
+        "fi",
+        "en",
+        "sv"
+      ]
+    },
+    "persona": {
+      "type": "object",
+      "required": [
+        "segment",
+        "age_band",
+        "tech_confidence",
+        "emotional_state",
+        "language"
+      ]
+    },
+    "entry_point": {
+      "enum": [
+        "operator_app_chat",
+        "business_portal_chat"
+      ]
+    },
+    "user_identified": {
+      "type": "boolean"
+    },
+    "opening_message": {
+      "type": "string"
+    },
+    "signals": {
+      "type": "object",
+      "required": [
+        "artifact",
+        "link_check",
+        "call_warning",
+        "subscription",
+        "device",
+        "operator_account",
+        "credential_exposure"
+      ],
+      "properties": {
+        "artifact": {
+          "type": "object",
+          "required": [
+            "type",
+            "sender",
+            "body",
+            "links",
+            "channel_language",
+            "received_at"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "sms",
+                "email",
+                "chat",
+                "call",
+                "letter",
+                "social_ad",
+                "push_notification",
+                "user_report",
+                "screen_note"
+              ]
+            },
+            "channel_language": {
+              "enum": [
+                "fi",
+                "en",
+                "sv"
+              ]
+            },
+            "sender": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "received_at": {
+              "type": "string"
+            },
+            "thread_contains_genuine_messages_from_same_sender": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "link_check": {
+          "type": [
+            "object",
+            "null",
+            "string"
+          ]
+        },
+        "call_warning": {
+          "type": [
+            "object",
+            "null",
+            "string"
+          ]
+        },
+        "subscription": {
+          "type": "object"
+        },
+        "device": {
+          "type": "object"
+        },
+        "operator_account": {
+          "type": "object"
+        },
+        "credential_exposure": {
+          "type": [
+            "object",
+            "null",
+            "string"
+          ]
+        },
+        "business": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "signal_availability": {
+      "type": "object"
+    },
+    "consent": {
+      "type": "object",
+      "required": [
+        "requires_consent",
+        "pre_granted"
+      ],
+      "properties": {
+        "requires_consent": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "artifact",
+              "link_check",
+              "call_warning",
+              "user_call_notes",
+              "subscription.products",
+              "subscription.recent_events",
+              "subscription.network_status",
+              "device.summary",
+              "device.recent_app_installs",
+              "device.security_findings",
+              "operator_account.recent_logins",
+              "credential_exposure",
+              "business.profile",
+              "business.staff_accounts"
+            ]
+          }
+        },
+        "pre_granted": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "artifact",
+              "link_check",
+              "call_warning",
+              "user_call_notes",
+              "subscription.products",
+              "subscription.recent_events",
+              "subscription.network_status",
+              "device.summary",
+              "device.recent_app_installs",
+              "device.security_findings",
+              "operator_account.recent_logins",
+              "credential_exposure",
+              "business.profile",
+              "business.staff_accounts"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

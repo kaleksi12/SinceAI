@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sinceai.ai/schemas/dna-2026/v2/bot_reply.schema.json",
+  "title": "Reply from a bot to the multi-turn harness",
+  "type": "object",
+  "required": [
+    "type"
+  ],
+  "properties": {
+    "type": {
+      "enum": [
+        "question",
+        "consent_request",
+        "final"
+      ]
+    },
+    "text": {
+      "type": "string"
+    },
+    "topics": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "credentials_entered",
+          "card_details_entered",
+          "code_shared",
+          "money_transferred",
+          "app_installed",
+          "remote_access_given",
+          "link_details",
+          "call_details",
+          "self_initiated",
+          "device_behaviour",
+          "signal_lost",
+          "account_affected",
+          "password_reused",
+          "business_access",
+          "payment_status",
+          "user_safety",
+          "time_of_event",
+          "message_content"
+        ]
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "artifact",
+          "link_check",
+          "call_warning",
+          "user_call_notes",
+          "subscription.products",
+          "subscription.recent_events",
+          "subscription.network_status",
+          "device.summary",
+          "device.recent_app_installs",
+          "device.security_findings",
+          "operator_account.recent_logins",
+          "credential_exposure",
+          "business.profile",
+          "business.staff_accounts"
+        ]
+      }
+    },
+    "answer": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
