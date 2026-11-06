@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 out/
 .llm_cache/
+runs/*/cases.jsonl

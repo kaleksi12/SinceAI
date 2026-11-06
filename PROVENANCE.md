@@ -30,7 +30,7 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `assistant/kit.py` | The one place that imports the organisers' kit (textcheck, baseline templates, vocabularies, guidance corpus) |
 | `assistant/prompts.py` | Analysis and writer prompts. Step lists per action come from dev ground-truth frequencies; action, step, claim and jargon texts come from the kit |
 | `assistant/bot.py` | Single-turn pipeline: LLM analysis -> rules -> LLM wording -> validation (kit `textcheck` unsafe-claim, step, language and jargon checks) -> retry -> kit template fallback |
-| `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample) and writes a submission file plus the matching cases subset |
+| `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample) into a new `runs/<timestamp>_<label>/` folder: predictions, the kit's evaluate.py report (json and text), the kit's validate.py result, the kit baseline's predictions and report on the same cases, and run_meta.json. Calls the kit scripts unchanged as subprocesses |
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |
 
@@ -38,7 +38,8 @@ What comes from the organisers and what we wrote. Updated with every change.
 | Path | Purpose |
 |---|---|
 | `out/baseline_dev.jsonl` | Baseline predictions on dev, used to reproduce the published numbers |
-| `out/*.jsonl` | Bot predictions and sampled case subsets from `scripts/run_single.py` |
+| `out/*.jsonl` | Scratch predictions from early runs (git-ignored, superseded by `runs/`) |
+| `runs/<timestamp>_<label>/` | One folder per run (committed except `cases.jsonl`, which is a regenerable copy of kit cases). Reports inside are produced by the kit's `evaluate.py`; the predictions are ours |
 | `.llm_cache/` | Cached LLM replies (git-ignored) |
 
 ## Third-party services

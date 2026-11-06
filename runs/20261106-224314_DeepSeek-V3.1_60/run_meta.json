@@ -1,0 +1,15 @@
+{
+  "started": "2026-11-06T22:43:14",
+  "model": "deepseek-ai/DeepSeek-V3.1",
+  "cases_file": "simset\\data\\dev\\cases.jsonl",
+  "n_cases": 60,
+  "sample": 60,
+  "answers": 60,
+  "workers": 4,
+  "seconds": 1,
+  "llm_calls": 0,
+  "cache_hits": 139,
+  "writer_fallbacks": 10,
+  "degraded_analyses": 0,
+  "git": "a7e449e+uncommitted changes"
+}
