@@ -23,7 +23,10 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `.env.example` | Template for the API key, base URL and model |
 | `requirements.txt` | Python dependencies: fastapi, uvicorn, openai, python-dotenv |
 | `assistant/__init__.py` | Empty package for our code |
+| `assistant/llm.py` | OpenAI-compatible client (Featherless) with an on-disk response cache in `.llm_cache/` |
+| `scripts/smoke_llm.py` | Lists models and tests key, JSON output and Finnish quality for one model |
 | `PROVENANCE.md` | This file |
+| `README.md` | Created by the team on GitHub (placeholder for now) |
 
 ## Generated (not committed)
 | Path | Purpose |
@@ -33,4 +36,4 @@ What comes from the organisers and what we wrote. Updated with every change.
 ## Third-party services
 | Service | Role |
 |---|---|
-| Featherless.ai (open-weights models, OpenAI-compatible API) | LLM calls, planned, not yet used |
+| Featherless.ai (open-weights models, OpenAI-compatible API) | LLM calls via `assistant/llm.py`; not yet exercised (no key in `.env`) |
