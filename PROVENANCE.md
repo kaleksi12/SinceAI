@@ -25,6 +25,8 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `assistant/__init__.py` | Empty package for our code |
 | `assistant/llm.py` | OpenAI-compatible client (Featherless) with an on-disk response cache in `.llm_cache/` |
 | `scripts/smoke_llm.py` | Lists models and tests key, JSON output and Finnish quality for one model |
+| `assistant/rules.py` | Safety envelope R1-R12: yes/no/unknown facts -> forced action, risk floor, escalation, questions to ask. Rules derived from patterns in the dev set; vocabularies (actions, topics, escalation targets) are the kit's |
+| `tests/test_rules.py` | 15 unit tests for the rules |
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |
 
