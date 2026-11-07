@@ -80,7 +80,7 @@ def analyze(view, gated_left, model, transcript=None, guidelines=None):
 
     degraded=True means the LLM never produced valid JSON and we fell back to cautious defaults.
     guidelines: an alternative GUIDELINES text (prompt optimization); None uses the current one."""
-    msgs = prompts.analysis_messages(view, gated_left, transcript, guidelines)
+    msgs = prompts.analysis_messages(view, gated_left, transcript)
     for _ in range(2):
         text = llm.complete(msgs, model=model, max_tokens=800)
         try:

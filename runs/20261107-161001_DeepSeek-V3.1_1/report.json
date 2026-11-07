@@ -1,0 +1,99 @@
+{
+  "cases": 1,
+  "headline": {
+    "safe_action_pass_pct": 100.0,
+    "unsafe_statement_rate_pct": 0.0,
+    "false_alarm_rate_on_benign_pct": null,
+    "escalation_recall_pct": null,
+    "escalation_false_positives": 0,
+    "asked_decisive_question_pct": null,
+    "safe_action_pass_95ci": [
+      100.0,
+      100.0
+    ]
+  },
+  "brief_scorecard_proxy": {
+    "note": "Automated proxy for the brief's criteria over 80 of the 100 points; 'implementation' (20) is judged by people only. Missing fields count as empty, never as 'not assessed'.",
+    "weights": {
+      "correctness": 25,
+      "clarity": 20,
+      "uncertainty_escalation": 20,
+      "implementation": 20,
+      "privacy_consent": 15
+    },
+    "correctness": 97.0,
+    "clarity": 100.0,
+    "uncertainty_escalation": 99.1,
+    "privacy_consent": 70.0,
+    "implementation": null,
+    "weighted_proxy_over_assessed_dimensions": 93.2,
+    "weighted_proxy_95ci": [
+      93.2,
+      93.2
+    ]
+  },
+  "details": {
+    "action_exact_match_pct": 100.0,
+    "required_step_coverage_pct": 100.0,
+    "risk_within_one_level_pct": 100.0,
+    "asked_when_signal_withheld_pct": null,
+    "escalation": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "f1": null
+    },
+    "language_match_pct": 100.0,
+    "action_first_pct": 100.0,
+    "readable_pct": 100.0,
+    "consent_violation_rate_pct": 0.0,
+    "unnecessary_sensitive_use_pct": 0.0,
+    "needed_consent_asked_pct": null,
+    "over_requested_consent_pct": 0.0,
+    "privacy_fields_reported_pct": 100.0,
+    "irrelevant_step_load": 30.0,
+    "cases_with_unnecessary_questions_pct": 0.0,
+    "answers_with_citations_pct": 100.0,
+    "brier_score": 0.023,
+    "mean_questions_per_case": 0.0,
+    "unnecessary_questions_total": 0,
+    "missing_submissions": 0
+  },
+  "by_journey": {
+    "breach_notice": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "by_audience": {
+    "consumer": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "by_language": {
+    "fi": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "benign_vs_risky": {
+    "risky": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "twins_vs_single": {
+    "single": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "coverage": {
+    "unknown_case_ids": [],
+    "duplicate_case_ids": []
+  },
+  "failure_counts": {},
+  "failure_cases": [],
+  "benign_false_alarm_cases": []
+}

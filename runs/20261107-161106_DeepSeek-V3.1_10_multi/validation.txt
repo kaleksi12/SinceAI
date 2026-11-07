@@ -1,0 +1,2 @@
+submission: 10 lines, 10 cases covered, 0 missing
+OK
