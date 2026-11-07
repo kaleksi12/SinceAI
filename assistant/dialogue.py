@@ -14,6 +14,7 @@ Each turn the whole conversation so far is analysed again by the LLM (bot.analyz
   3. Else give the final answer. Facts we asked about but never got a clear answer to are treated as the riskier branch.
 """
 import copy
+import re
 import sys
 from pathlib import Path
 
@@ -25,7 +26,13 @@ if str(ROOT) not in sys.path:
 from assistant import bot, rules  # noqa: E402
 
 MAX_CONSENT_FIELDS = 3  # never ask for more than this many signals at once
-MAX_CLARIFY = 2  # free text only: open "what happened?" questions before we must answer
+MAX_CLARIFY = 1  # free text only: open "what happened?" questions before we must answer
+# Live chat: a user who says they do not know gets the answer now (for the riskier branch) instead of more questions.
+DONT_KNOW = re.compile(r"\b(do ?n[o']?t know|dunno|not sure|no idea|can'?t remember|do ?n[o']?t remember)\b|\ben (tiedä|tie|muista|ole varma)\b|"
+                       r"\bei (hajua|aavistustakaan)\b|\bvet inte\b|\bingen aning\b|\bminns inte\b", re.I)
+CONFUSED = re.compile(r"^\W*(what|huh|eh|sorry|pardon|what do you mean|mitä|mitä tarkoitat|häh|en ymmärrä|i don'?t understand|vad|va|förstår inte)?\W*$|"
+                      r"\b(how is (this|that|it) relevant|why (do you ask|are you asking|does (it|that|this) matter)|what does (that|this|it) have to do|"
+                      r"miksi kysyt|mitä (se|tämä) liittyy|miten (se|tämä) liittyy|varför frågar du)\b", re.I)
 
 # What we tell the user we would look at, per consent-gated signal path (the kit's signal_dictionary has English only).
 FIELD_LABELS = {
@@ -81,7 +88,7 @@ def step(event, state):
         case = copy.deepcopy(event["case"])
         state.clear()
         state.update(case=case, model=event.get("model"), revealed=set(), refused=set(), consent_requested=set(),
-                     asked=[], clarified=0, lang=case.get("language"), last=None,
+                     asked=[], clarified=0, lang=case.get("language"), last=None, live=bool(event.get("live")), awaiting=False,
                      transcript=[{"role": "user", "text": case["opening_message"]}])
     elif kind == "user_reply":
         state["transcript"].append({"role": "user", "text": event["text"]})
@@ -93,7 +100,58 @@ def step(event, state):
         state["refused"] |= set(event.get("refused") or [])
         if event.get("text"):
             state["transcript"].append({"role": "user", "text": event["text"]})
-    return _advance(state, force_final=(kind == "turn_limit"))
+    reply = None
+    if state["live"] and kind in ("start", "user_reply") and not state["awaiting"]:
+        reply = _route(state)
+    q = state.get("last_question")
+    if state["live"] and kind == "user_reply" and state["awaiting"] and q and not q.get("explained") and CONFUSED.search(event["text"]):
+        # "what??" is not an answer: explain why we ask and ask the same thing again, in other words.
+        q["explained"] = True  # only once: a second "what?" gets the answer for the riskier branch
+        text = bot.phrase_question(q["topic"], state["transcript"], state["lang"] or "en", state["case"]["audience"], state["model"], explain=True) \
+            if q["topic"] else q["text"]
+        state["transcript"].append({"role": "assistant", "text": text})
+        return {"type": "question", "text": text, "topics": [q["topic"]] if q["topic"] else []}
+    dont_know = state["live"] and kind == "user_reply" and state["awaiting"] and bool(DONT_KNOW.search(event["text"]) or CONFUSED.search(event["text"]))
+    reply = reply or _advance(state, force_final=(kind == "turn_limit") or dont_know)
+    state["awaiting"] = reply["type"] in ("question", "consent_request")  # the next message answers our question
+    return reply
+
+
+def _drop_off_topic_facts(facts):
+    """Live chat: the model marks facts "unknown" that the story never touches, and each one becomes a question
+    (and, after "I don't know", a worst-case action). Only keep the ones the story makes relevant."""
+    if facts["code_shared"] == "unknown" and facts["code_for"] == "na":
+        facts["code_shared"] = "na"  # nobody asked for a code
+    if facts["self_initiated"] == "unknown" and "yes" not in (facts["operator_change"], facts["login_prompts_unrequested"]):
+        facts["self_initiated"] = "na"  # "did you order this change?" only fits when something changed
+
+
+def _lang(state, analysis=None):
+    """The reply language. Live chat: the language of the user's latest message when it can be detected (people type
+    their own text over a Finnish sample, or switch language); otherwise the case's, the analysis' or the last one."""
+    if state.get("live"):
+        user = [t["text"] for t in state["transcript"] if t["role"] == "user"]
+        det = bot.kit.textcheck.detect_language(user[-1]) if user else None
+        if det in ("fi", "en", "sv"):
+            return det
+    return state["case"].get("language") or (analysis or {}).get("language") or state["lang"] or "en"
+
+
+def _route(state):
+    """Live chat only (the web demo, never the kit's simulation): small talk, general security questions and
+    follow-ups after an answer get a short grounded reply; only a (new) incident goes through the decision pipeline.
+    Returns None for an incident. A long first message is clearly a situation: skip the extra LLM call."""
+    text = state["transcript"][-1]["text"]
+    if not state["last"] and len(text.split()) >= 12:
+        return None
+    lang = _lang(state) if state["live"] and bot.kit.textcheck.detect_language(text) else state["lang"]
+    r = bot.route(state["transcript"], state["last"] and state["last"]["answer"], lang, state["model"])
+    if not r:
+        return None
+    state["lang"] = r["language"]
+    state["transcript"].append({"role": "assistant", "text": r["reply"]})
+    state["debug"] = {"route": r["intent"], "language": state["lang"]}
+    return {"type": "message", "text": r["reply"]}
 
 
 def _advance(state, force_final):
@@ -106,6 +164,8 @@ def _advance(state, force_final):
         view = bot.build_view(case, state["revealed"])
         left = [p for p in gated if p not in state["revealed"] and p not in state["refused"]]
         analysis, degraded = bot.analyze(view, left, state["model"], state["transcript"])
+        if state.get("live"):
+            _drop_off_topic_facts(analysis["facts"])
         wanted = [p for p in analysis["needs_signals"] if p in left][:MAX_CONSENT_FIELDS]
         if not wanted or degraded or force_final:
             break
@@ -115,7 +175,7 @@ def _advance(state, force_final):
             continue
         if state["consent_requested"]:  # one consent request per conversation: never ask again and again
             break
-        lang = case.get("language") or analysis["language"] or state["lang"] or "en"
+        lang = _lang(state, analysis)
         state["lang"] = lang
         state["consent_requested"] |= set(wanted)
         text = CONSENT_TEXT[lang] % "; ".join(field_label(p, lang) for p in wanted)
@@ -123,7 +183,7 @@ def _advance(state, force_final):
         state["debug"] = _debug(state, analysis, degraded)
         return {"type": "consent_request", "fields": wanted, "text": text}
 
-    lang = case.get("language") or analysis["language"] or state["lang"] or "en"
+    lang = _lang(state, analysis)
     state["lang"] = lang
     audience = case["audience"]
 
@@ -139,23 +199,29 @@ def _advance(state, force_final):
             state["debug"] = _debug(state, analysis, degraded, env_now)
             return {"type": "message", "text": text}
 
+    env0 = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])
+
     # Free text only (the web demo): if the user has not said what happened yet, ask an open question first.
-    # Never in the kit's simulation, where the user only answers fact questions.
+    # Not when we already know enough to ask a decisive question or a rule fired; never in the kit's simulation.
     if (case["case_id"].startswith("DEMO-") and analysis["clarify"] and not state["last"] and not force_final
+            and not env0["ask"] and not env0["forced_action"]
             and state["clarified"] < MAX_CLARIFY and analysis["proposed_action"] != "decline_out_of_scope"):
         state["clarified"] += 1
+        state["last_question"] = {"topic": None, "text": analysis["clarify"]}
         state["transcript"].append({"role": "assistant", "text": analysis["clarify"]})
         state["debug"] = _debug(state, analysis, degraded)
         return {"type": "question", "text": analysis["clarify"], "topics": []}
 
     # Decisive facts still unknown (ordered by priority); ask about the first one we have not asked yet.
-    env0 = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])
+    # Live chat counts the open question too: at most MAX_QUESTIONS questions before the answer.
     unknown = env0["ask"]
     pending = [s for s in unknown if rules.SLOT_TOPIC[s] not in state["asked"]]
-    if pending and not force_final and len(state["asked"]) < bot.MAX_QUESTIONS:
+    if pending and not force_final and len(state["asked"]) + (state["clarified"] if state.get("live") else 0) < bot.MAX_QUESTIONS:
         topic = rules.SLOT_TOPIC[pending[0]]
         state["asked"].append(topic)
-        text = bot.question_text(topic, lang)
+        # Live chat: the question is phrased for this conversation (e.g. about "your employee", not "you").
+        text = bot.phrase_question(topic, state["transcript"], lang, audience, state["model"]) if state.get("live") else bot.question_text(topic, lang)
+        state["last_question"] = {"topic": topic, "text": text}
         state["transcript"].append({"role": "assistant", "text": text})
         state["debug"] = _debug(state, analysis, degraded, env0)
         return {"type": "question", "text": text, "topics": [topic]}

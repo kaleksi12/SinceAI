@@ -92,6 +92,72 @@ class DialogueTest(unittest.TestCase):
         self.assertEqual([r["type"] for r in replies], ["question", "final"])
 
 
+    def test_live_chat_routes_questions_and_small_talk(self):
+        routed = {"intent": "question", "language": "en", "reply": "Phishing is a scam that tries to get your login details."}
+        with mock.patch.object(bot, "route", lambda *a, **k: routed):
+            state = {}
+            reply = dialogue.step({"type": "start", "case": make_case(), "live": True}, state)
+        self.assertEqual(reply, {"type": "message", "text": routed["reply"]})
+
+    def test_live_chat_does_not_route_answers_to_our_question(self):
+        calls = []
+        replies = []
+        queue = [analysis({"code_shared": "unknown", "code_for": "bank"}), analysis({"code_shared": "yes", "code_for": "bank"})]
+        with mock.patch.object(bot, "route", lambda *a, **k: calls.append(1)), mock.patch.object(bot, "phrase_question", lambda *a, **k: "Q?"), mock.patch.object(bot, "analyze", lambda *a, **k: queue.pop(0)), \
+                mock.patch.object(bot, "compose_answer", fake_compose):
+            state = {}
+            replies.append(dialogue.step({"type": "start", "case": make_case(), "live": True}, state))
+            replies.append(dialogue.step({"type": "user_reply", "text": "yes"}, state))
+        self.assertEqual([r["type"] for r in replies], ["question", "final"])
+        self.assertEqual(len(calls), 1)  # only the opening message was routed (and judged an incident)
+
+    def test_live_chat_answers_in_the_language_the_user_writes(self):
+        case = dict(make_case(), language="fi", opening_message="I am asking for our company. A supplier wants us to pay an invoice to a new bank account. Is it legitimate?")
+        state = {}
+        with mock.patch.object(bot, "analyze", lambda *a, **k: analysis()), mock.patch.object(bot, "compose_answer", fake_compose):
+            dialogue.step({"type": "start", "case": case, "live": True}, state)
+        self.assertEqual(state["lang"], "en")
+
+    def test_live_chat_stops_asking_when_the_user_does_not_know(self):
+        queue = [analysis({"card_details_entered": "unknown", "credentials_entered": "unknown"})] * 3
+        with mock.patch.object(bot, "route", lambda *a, **k: None), mock.patch.object(bot, "analyze", lambda *a, **k: queue.pop(0)), \
+                mock.patch.object(bot, "compose_answer", fake_compose):
+            state = {}
+            first = dialogue.step({"type": "start", "case": dict(make_case(), case_id="DEMO-2"), "live": True}, state)
+            second = dialogue.step({"type": "user_reply", "text": "I DO NOT KNOW"}, state)
+        self.assertEqual([first["type"], second["type"]], ["question", "final"])
+
+    def test_no_open_question_when_a_decisive_one_exists(self):
+        vague = bot._normalise({"facts": {"card_details_entered": "unknown"}, "clarify": "What did the link look like?"}), False
+        replies = self.run_events(dict(make_case(), case_id="DEMO-3"), [vague], [])
+        self.assertEqual(replies[0]["topics"], ["card_details_entered"])
+
+    def live(self, analyses, texts):
+        queue = list(analyses)
+        asked = []
+        with mock.patch.object(bot, "route", lambda *a, **k: None), mock.patch.object(bot, "analyze", lambda *a, **k: queue.pop(0)), \
+                mock.patch.object(bot, "compose_answer", fake_compose), \
+                mock.patch.object(bot, "phrase_question", lambda topic, *a, **k: asked.append((topic, k.get("explain", False))) or "Q %s?" % topic):
+            state = {}
+            replies = [dialogue.step({"type": "start", "case": dict(make_case(), case_id="DEMO-4"), "live": True}, state)]
+            for t in texts:
+                replies.append(dialogue.step({"type": "user_reply", "text": t}, state))
+        return replies, asked
+
+    def test_live_chat_explains_the_question_once_when_the_user_is_confused(self):
+        a = analysis({"credentials_entered": "unknown"})
+        replies, asked = self.live([a, a], ["how is this relevant", "huh?"])
+        self.assertEqual([r["type"] for r in replies], ["question", "question", "final"])
+        self.assertEqual(asked, [("credentials_entered", False), ("credentials_entered", True)])
+
+    def test_live_chat_skips_the_change_question_for_a_phishing_story(self):
+        replies, asked = self.live([analysis({"self_initiated": "unknown", "credentials_entered": "unknown", "operator_change": "unknown"})], [])
+        self.assertEqual(replies[0]["topics"], ["credentials_entered"])
+
+    def test_live_chat_does_not_ask_about_codes_nobody_asked_for(self):
+        replies, asked = self.live([analysis({"code_shared": "unknown", "credentials_entered": "unknown"})], [])
+        self.assertEqual(replies[0]["topics"], ["credentials_entered"])
+
 class ApiTest(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(api.app)

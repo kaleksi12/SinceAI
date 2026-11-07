@@ -129,12 +129,13 @@ def pick_passages(summary, action, lang, k=2):
     return ids, [{"title": corpus[i].get("title_" + lang) or corpus[i]["title_en"], "text": corpus[i].get("text_" + lang) or corpus[i]["text_en"]} for i in ids]
 
 
-def check_advice(advice, steps, lang, action, core, monitoring=False):
+def check_advice(advice, steps, lang, action, core, monitoring=False, facts=None):
     """Validate the writer's text with the kit's checks. Returns a list of problems (empty = acceptable)."""
     tc = kit.textcheck
     full = advice + "\n" + "\n".join(steps)
     # Claims that are never acceptable, plus context-dependent ones (see prompts.ALWAYS_BAN).
-    bans = list(prompts.ALWAYS_BAN) + ([] if action == "no_action_needed" else ["false_reassurance"]) + (["remove_monitoring_immediately"] if monitoring else [])
+    bans = list(prompts.ALWAYS_BAN) + ([] if action == "no_action_needed" else ["false_reassurance"]) + (["remove_monitoring_immediately"] if monitoring else []) \
+        + prompts.extra_bans(action, facts or {})
     problems = ["unsafe statement (%s): '%s'" % (u["claim"], u["match"]) for u in tc.find_unsafe(full, bans, lang)]
     n = len(tc.words(advice))
     if n < 25 or n > 150:
@@ -165,7 +166,8 @@ def write_advice(lang, audience, final, env, analysis, topics, passages, model, 
         try:
             out = parse_json(text)
             advice, steps = str(out["advice_text"]).strip(), [str(s) for s in out.get("steps") or []][:5]
-            problems = check_advice(advice, steps, lang, final["primary_action"], core, analysis["facts"]["monitoring_suspected"] == "yes")
+            problems = check_advice(advice, steps, lang, final["primary_action"], core, analysis["facts"]["monitoring_suspected"] == "yes",
+                                    analysis["facts"])
         except (ValueError, TypeError, KeyError, AttributeError):
             advice, steps, problems = "", [], ["the reply was not a valid JSON object"]
         if not problems:
@@ -181,6 +183,72 @@ def write_advice(lang, audience, final, env, analysis, topics, passages, model, 
         templ = prompts.CALL_FALLBACK[final["primary_action"]]
         return templ.get(lang) or templ["en"], [], True
     return kit.baseline.TEMPL[final["primary_action"]].get(lang) or kit.baseline.TEMPL[final["primary_action"]]["en"], [], True
+
+
+def phrase_question(topic, transcript, lang, audience, model, explain=False):
+    """Live chat: the decisive question for `topic`, worded for this conversation (one question, the user's language).
+    Falls back to the kit's fixed wording if the reply is unusable."""
+    fixed = question_text(topic, lang)
+    meaning = kit.ref("question_topics.json")["topics"].get(topic, {}).get("en", topic)
+    msgs = prompts.question_messages(meaning, fixed, transcript, lang, audience, explain)
+    try:
+        text = re.sub(r"<think>.*?</think>", "", llm.complete(msgs, model=model, max_tokens=150), flags=re.S).strip().strip('"')
+    except Exception:  # noqa: BLE001  (a wording problem must never break the chat)
+        return fixed
+    ok = (text and len(text.split()) <= (45 if explain else 25) and text.count("?") == 1
+          and not kit.textcheck.find_unsafe(text, list(prompts.ALWAYS_BAN), lang)
+          and kit.textcheck.detect_language(text) in (None, lang, "mixed"))
+    return text if ok else fixed
+
+
+def search_passages(text, lang, k=3):
+    """Guidance passages sharing the most words with `text` (Finnish and English text both searched)."""
+    words = set(re.findall(r"\w{4,}", text.lower()))
+    scored = []
+    for g in kit.guidance():
+        hay = set(re.findall(r"\w{4,}", " ".join(str(g.get(f, "")) for f in ("title_en", "text_en", "title_fi", "text_fi")).lower()))
+        scored.append((len(words & hay), g["id"], g))
+    lang = lang if lang in ("fi", "en") else "en"
+    return [{"title": g["title_" + lang], "text": g["text_" + lang]} for n, _, g in sorted(scored, key=lambda x: -x[0])[:k] if n >= 2]
+
+
+# Words a non-technical user may not know, on top of the kit's jargon list (live chat replies only).
+EXTRA_JARGON = {"en": ["password manager", "two-factor", "multi-factor", "authenticat", "browser", "domain", "url", "encrypt", "firewall", "vpn", "malicious"],
+                "fi": ["salasanojen hallin", "salasananhallin", "autentik", "selain", "domain", "url", "salaus", "palomuuri", "vpn", "haittaohjelm"],
+                "sv": ["lösenordshanterare", "autentiser", "webbläsare", "domän", "url", "krypter", "brandvägg", "vpn"]}
+
+
+def plain_language_problems(text, lang):
+    """Technical words in a live-chat reply (the kit's jargon list plus EXTRA_JARGON)."""
+    low = text.lower()
+    hits = [str(h) for h in kit.textcheck.jargon_hits(text, lang)]
+    return hits + [w for w in EXTRA_JARGON.get(lang, EXTRA_JARGON["en"]) if w in low]
+
+
+def route(transcript, answer, lang, model):
+    """Live chat: {"intent", "language", "reply"} for a message that is not an incident, or None (run the pipeline)."""
+    recent = " ".join(t["text"] for t in transcript[-3:])
+    msgs = prompts.router_messages(transcript, answer, search_passages(recent, lang))
+    for attempt in range(2):
+        text = llm.complete(msgs, model=model, max_tokens=600)
+        try:
+            r = parse_json(text)
+        except (ValueError, TypeError, AttributeError):
+            return None
+        intent, reply = r.get("intent"), str(r.get("reply") or "").strip()
+        language = lang or (r.get("language") if r.get("language") in prompts.LANG_NAME else "en")
+        jargon = plain_language_problems(reply, language)
+        if not jargon or attempt:
+            break
+        msgs = msgs + [{"role": "assistant", "content": text},
+                       {"role": "user", "content": "Rewrite the reply without these technical words, in everyday language: %s. Return only the JSON object." % ", ".join(jargon)}]
+    if intent not in ("question", "smalltalk", "followup") or not reply:
+        return None
+    if intent == "followup" and not answer:
+        return None
+    if kit.textcheck.find_unsafe(reply, list(prompts.ALWAYS_BAN), language):
+        return None  # let the full pipeline (with its checks and templates) answer instead
+    return {"intent": intent, "language": language, "reply": reply}
 
 
 def follow_up(transcript, answer, lang, model):
@@ -252,7 +320,7 @@ SINGLE_TURN_RECHECK = {"self_initiated": "no", "code_shared": "yes"}
 OVERRIDE_SLOTS = {"money_transferred"}
 
 
-def single_turn_envelope(analysis, signals, audience, lang):
+def single_turn_envelope(analysis, signals, audience, lang, journey=None):
     """(slots to ask about, envelope) for a single-turn answer.
 
     Unknown decisive facts are asked, and the advice covers their riskier answer. A rule that fires ONLY because of
@@ -261,18 +329,27 @@ def single_turn_envelope(analysis, signals, audience, lang):
     more often than it helped (offline re-scoring of the dev run)."""
     facts = dict(analysis["facts"])
     for slot, val in SINGLE_TURN_RECHECK.items():
-        # self_initiated only matters when something changed (SIM/eSIM, order, login prompts); elsewhere leave it alone.
-        relevant = slot != "self_initiated" or facts["operator_change"] != "na" or facts["login_prompts_unrequested"] != "na"
+        # self_initiated only matters when something changed (SIM/eSIM, order, login prompts, a login/account notice).
+        relevant = (slot != "self_initiated" or facts["operator_change"] != "na" or facts["login_prompts_unrequested"] != "na"
+                    or journey == "breach_notice")
         if facts.get(slot) == val and relevant:
             facts[slot] = "unknown"
+    if facts["code_shared"] == "unknown" and facts["code_for"] == "na":
+        # Nobody asked for a code: a code question would only take the place of the question that matters.
+        facts["code_shared"] = "na"
     known = rules.evaluate(facts, signals, audience, benign=analysis["benign"])
     ask = pick_questions(known["ask"], lang)
     env = rules.evaluate(facts, signals, audience, assume=ask, benign=analysis["benign"])
     # Exception: a caller who asked for a code. The kit's single-turn rule is "give the step that is safe if the riskier
     # answer is true", and a call has no 'delete it' option, so the assumed code_shared branch keeps its action.
     art = (signals or {}).get("artifact")
-    asked_code_on_call = isinstance(art, dict) and art.get("type") == "call" and "code_shared" in ask and env["reasons"][:1] == ["R1"]
-    if env["forced_action"] and not known["forced_action"] and not asked_code_on_call:
+    # Only for bank and operator codes: a 'support' caller asking for some other code (a portal code) is not a bank case.
+    asked_code_on_call = (isinstance(art, dict) and art.get("type") == "call" and "code_shared" in ask and env["reasons"][:1] == ["R1"]
+                          and facts["code_for"] in ("bank", "operator"))
+    # Same idea for a small-payment lure the user already opened: the riskier branch (card details typed in) keeps
+    # 'contact the bank', because 'verify' is no protection if the card number is already with the scammer.
+    paid_lure_opened = journey == "clicked_link" and "card_details_entered" in ask and facts["lure_type"] == "small_payment_or_card"
+    if env["forced_action"] and not known["forced_action"] and not asked_code_on_call and not paid_lure_opened:
         env = dict(env, forced_action=None, risk_floor="none",
                    also_actions=list(dict.fromkeys([env["forced_action"]] + env["also_actions"])))
     return ask, env
@@ -292,6 +369,6 @@ def answer_single_turn(case, model=None):
         analysis, degraded = analyze(build_view(case, revealed), [p for p in gated if p not in revealed], model)
     view = build_view(case, revealed)
 
-    ask, env = single_turn_envelope(analysis, view["signals"], case["audience"], case["language"])
+    ask, env = single_turn_envelope(analysis, view["signals"], case["audience"], case["language"], case.get("journey"))
     topics = [rules.SLOT_TOPIC[s] for s in ask]
     return compose_answer(case, analysis, degraded, view, revealed, env, topics, model, "single_turn", revealed - pre)

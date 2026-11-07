@@ -163,10 +163,12 @@ def chat(req: ChatRequest):
             full = dict(_scenarios()[req.scenario_id])
         else:
             full = _free_case(req.audience)
+        if full["opening_message"] != req.message.strip():
+            full["language"] = None  # the user wrote their own text: its language decides, not the sample's
         full["opening_message"] = req.message.strip()
         sid, s = _new_session(full)
         # visible_case() is the kit's own view of a case: no labels, and sensitive signals hidden until allowed.
-        event = {"type": "start", "case": kit.visible_case(full)}
+        event = {"type": "start", "case": kit.visible_case(full), "live": True}
     else:
         sid, s = req.session_id, _get_session(req.session_id)
         full = s["full_case"]

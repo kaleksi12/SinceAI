@@ -69,5 +69,36 @@ class SingleTurnTest(unittest.TestCase):
             self.assertLessEqual(len(topics), 3)
 
 
+class EnvelopeFixesTest(unittest.TestCase):
+    """Fixes found by re-scoring the dev run offline (code_for, call codes, opened payment lures, breach notices)."""
+
+    def test_no_code_question_when_nobody_asked_for_a_code(self):
+        ask, _ = bot.single_turn_envelope(an({"code_shared": "unknown", "credentials_entered": "unknown", "app_installed": "yes"}),
+                                          {}, "consumer", "en", "clicked_link")
+        self.assertEqual(ask[0], "credentials_entered")
+
+    def test_portal_code_on_a_call_is_not_a_bank_case(self):
+        call = {"artifact": {"type": "call", "body": ""}}
+        _, env = bot.single_turn_envelope(an({"code_shared": "unknown", "code_for": "other"}), call, "small_business", "en")
+        self.assertIsNone(env["forced_action"])
+        _, env = bot.single_turn_envelope(an({"code_shared": "unknown", "code_for": "bank"}), call, "consumer", "en")
+        self.assertEqual(env["forced_action"], "contact_bank_and_block_cards")
+
+    def test_opened_payment_lure_keeps_the_bank_action(self):
+        facts = {"card_details_entered": "unknown", "lure_type": "small_payment_or_card"}
+        _, env = bot.single_turn_envelope(an(facts), {}, "consumer", "fi", "clicked_link")
+        self.assertEqual(env["forced_action"], "contact_bank_and_block_cards")
+        _, env = bot.single_turn_envelope(an(facts), {}, "consumer", "fi", "suspicious_message")
+        self.assertIsNone(env["forced_action"])
+
+    def test_breach_notice_asks_whether_the_user_did_it(self):
+        ask, _ = bot.single_turn_envelope(an({"self_initiated": "no"}), {}, "consumer", "en", "breach_notice")
+        self.assertEqual(ask, ["self_initiated"])
+
+    def test_card_blocking_banned_only_when_no_card_is_involved(self):
+        self.assertEqual(bot.prompts.extra_bans("contact_operator_support", {}), ["block_card_unneeded"])
+        self.assertEqual(bot.prompts.extra_bans("verify_via_official_channel", {"card_details_entered": "unknown"}), [])
+
+
 if __name__ == "__main__":
     unittest.main()
