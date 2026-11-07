@@ -76,6 +76,9 @@ def evaluate(facts, signals=None, audience="consumer", assume=()):
 
     # Decisive facts we still do not know, in priority order: these become questions.
     ask = [s for s in DECISIVE if f[s] == "unknown"]
+    # When nothing has been done yet, the lure tells which question matters most (card lure -> card details first).
+    first = {"small_payment_or_card": ("card_details_entered", "money_transferred"), "credentials_or_transfer": ("credentials_entered",)}.get(f["lure_type"], ())
+    ask.sort(key=lambda s: s not in first)  # stable sort: only moves the lure-relevant slots to the front
     # "eff" is what the triggers below look at: assumed slots take their riskier value.
     eff = dict(f)
     for s in assume:

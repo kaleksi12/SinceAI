@@ -12,4 +12,11 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      // The chat UI calls relative /api/... URLs; in development they are forwarded to the Python backend
+      // (uvicorn assistant.api:app --port 8000), so the browser never needs the backend's address or CORS.
+      proxy: { "/api": "http://localhost:8000" },
+    },
+  },
 });

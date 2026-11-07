@@ -24,8 +24,8 @@ CHOICES = {"code_for": {"operator", "bank", "other"}, "credentials_kind": {"bank
            "lure_type": {"small_payment_or_card", "credentials_or_transfer", "other"}}
 MAX_QUESTIONS = 2  # at most this many questions per answer / conversation (fewer questions = fewer "unnecessary" ones)
 # The kit has no question wording for this topic, so we supply it.
-EXTRA_QUESTIONS = {"remote_access_given": {"fi": "Annoitko soittajalle etäkäytön laitteeseesi?", "en": "Did you let the caller control your device remotely?",
-                                           "sv": "Gav du uppringaren fjärråtkomst till din enhet?"}}
+EXTRA_QUESTIONS = {"remote_access_given": {"fi": "Annoitko jollekulle etäkäytön laitteeseesi?", "en": "Did you let anyone control your device remotely?",
+                                           "sv": "Gav du någon fjärråtkomst till din enhet?"}}
 
 
 def parse_json(text):
@@ -119,9 +119,11 @@ def check_advice(advice, steps, lang, action, core, monitoring=False):
     sents = tc.sentences(advice)
     if sents and n / len(sents) > 20:
         problems.append("sentences are too long")
-    # Whole text and each longer sentence must be in the user's language (no mixing).
+    # The whole text must be in the user's language (this is what the evaluator scores). Single sentences are only
+    # rejected when they are clearly in another language: very short Finnish sentences often look "mixed" to the detector.
     det = tc.detect_language(advice)
-    if det not in (None, lang) or any(tc.detect_language(s) not in (None, lang) for s in sents if len(tc.words(s)) >= 4):
+    other = [s for s in sents if len(tc.words(s)) >= 4 and tc.detect_language(s) not in (None, lang, "mixed")]
+    if det not in (None, lang) or other:
         problems.append("wrong or mixed language, write only in " + prompts.LANG_NAME[lang])
     jar = tc.jargon_hits(advice, lang)
     if jar:
@@ -171,7 +173,7 @@ def signals_used(view, revealed):
             used.append(k)
         elif isinstance(v, dict):
             used += ["%s.%s" % (k, s) for s, x in v.items() if x not in (None, GATED) and "%s.%s" % (k, s) in valid]
-    return used + sorted(revealed)
+    return list(dict.fromkeys(used + sorted(revealed)))  # a revealed path can also be found by the scan above
 
 
 def compose_answer(case, analysis, degraded, view, revealed, env, topics, model, mode, consent_requested=()):

@@ -5,3 +5,10 @@ __pycache__/
 out/
 .llm_cache/
 runs/*/cases.jsonl
+
+node_modules/
+frontend/package-lock.json
+frontend/dist/
+frontend/.output/
+frontend/.vinxi/
+*.tsbuildinfo

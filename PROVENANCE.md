@@ -37,6 +37,16 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |
 
+## Frontend (`frontend/`)
+Generated with Lovable (TanStack Start, React, Tailwind, shadcn/Radix UI) and added by a teammate; the UI components in `frontend/src/components/ui/` and the Lovable support files (`routeTree.gen.ts`, error capture, config) are unchanged. We changed:
+| Path | Change |
+|---|---|
+| `frontend/src/lib/chatService.ts` | Was a keyword-matching mock; now the typed client for `/api/chat`, `/api/scenarios` and `/api/escalate` |
+| `frontend/src/routes/index.tsx` | Chat page rewritten: scenario picker, consent card, answer card, escalation, new-conversation button, errors. The mock conversation and the unsupported attachment upload are gone |
+| `frontend/src/components/chat/AnswerCard.tsx`, `ConsentCard.tsx` | New: risk/steps/sources/escalation card and the Allow / Not now consent card |
+| `frontend/vite.config.ts` | Added a dev proxy from `/api` to the backend on port 8000 |
+| `.gitignore` | Ignores `node_modules`, build output and `frontend/package-lock.json` (the project uses `bun.lock`) |
+
 ## Generated (not committed)
 | Path | Purpose |
 |---|---|

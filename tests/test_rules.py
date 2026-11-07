@@ -1,3 +1,4 @@
+"""Unit tests for the safety envelope (assistant/rules.py). No LLM involved: the facts are given directly."""
 import sys
 import unittest
 from pathlib import Path
@@ -32,6 +33,12 @@ class RulesTest(unittest.TestCase):
         env = evaluate({"money_transferred": "unknown", "code_shared": "unknown"}, assume=["money_transferred"])
         self.assertEqual(env["reasons"], ["R2"])
         self.assertEqual(env["also_actions"], [])
+
+    def test_card_lure_asks_about_card_details_before_credentials(self):
+        facts = {"credentials_entered": "unknown", "card_details_entered": "unknown", "lure_type": "small_payment_or_card"}
+        self.assertEqual(evaluate(facts)["ask"], ["card_details_entered", "credentials_entered"])
+        facts["lure_type"] = "credentials_or_transfer"
+        self.assertEqual(evaluate(facts)["ask"], ["credentials_entered", "card_details_entered"])
 
     def test_business_money_escalates_to_business_support(self):
         env = evaluate({"money_transferred": "yes"}, audience="small_business")

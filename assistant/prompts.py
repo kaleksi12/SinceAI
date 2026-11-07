@@ -50,7 +50,7 @@ Return exactly one JSON object and nothing else:
 - "na": not relevant to this situation. This is the default for most facts. Typically 0 to 2 facts are "unknown"; never mark everything "unknown".
 - Example: a user who clicked a link and says nothing about typing card details -> card_details_entered is "unknown". A user who only says they received a message -> credentials_entered and card_details_entered are "na" (nothing suggests they acted).
 Facts:
-- self_initiated: the user (or a colleague) started the change or order themselves.
+- self_initiated: the user (or a colleague) started the change or order themselves. When the user reports an unexpected SIM/eSIM change, order, login prompt or notice and does not say they caused it, this is "unknown" (never "no").
 - code_shared: a one-time code, PIN or confirmation code was given to someone.
 - credentials_entered: a username, password or login details were typed somewhere.
 - card_details_entered: card or payment details were entered, or a payment was made.

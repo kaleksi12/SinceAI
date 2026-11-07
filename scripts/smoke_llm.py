@@ -1,7 +1,7 @@
-"""Check the Featherless key, JSON output and Finnish quality.
+"""Check the Featherless key, JSON output and Finnish quality of a model before using it.
 
-    python scripts/smoke_llm.py --list            # list model ids
-    python scripts/smoke_llm.py --model <id>      # test one model
+    python scripts/smoke_llm.py --list            # list all model ids the key can use
+    python scripts/smoke_llm.py --model <id>      # send one Finnish scam-text prompt and report latency and JSON validity
 """
 import argparse
 import json
