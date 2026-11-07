@@ -62,6 +62,6 @@ Ordinary consumers and small business owners can both access the assistant throu
 
 ## 9. Files
 - Predictions for test cases: `test_predictions.jsonl`
-- Evalaution of predictions for 588 dev cases: `runs/20261107-194019_dev_588_single_callfix/report.txt`
+- Evaluation of predictions for 588 dev cases: `runs/20261107-194019_dev_588_single_callfix/report.txt`
 - Setup instructions: `README.md`
 - Report `RESULTS.md`
