@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
 from assistant import bot, rules  # noqa: E402
 
 MAX_CONSENT_FIELDS = 3  # never ask for more than this many signals at once
+MAX_CLARIFY = 2  # free text only: open "what happened?" questions before we must answer
 
 # What we tell the user we would look at, per consent-gated signal path (the kit's signal_dictionary has English only).
 FIELD_LABELS = {
@@ -80,7 +81,7 @@ def step(event, state):
         case = copy.deepcopy(event["case"])
         state.clear()
         state.update(case=case, model=event.get("model"), revealed=set(), refused=set(), consent_requested=set(),
-                     asked=[], lang=case.get("language"), last=None,
+                     asked=[], clarified=0, lang=case.get("language"), last=None,
                      transcript=[{"role": "user", "text": case["opening_message"]}])
     elif kind == "user_reply":
         state["transcript"].append({"role": "user", "text": event["text"]})
@@ -126,6 +127,27 @@ def _advance(state, force_final):
     state["lang"] = lang
     audience = case["audience"]
 
+    # After an answer, a new message is usually a follow-up ("how do I do that?", "thanks"): reply to it in context
+    # instead of producing a whole new advice card, unless what the user said changes the decision.
+    if state["last"] and not force_final:
+        env_now = rules.evaluate(analysis["facts"], view["signals"], audience, assume=env_assumed(analysis, state), benign=analysis["benign"])
+        now = rules.clamp({"primary_action": analysis["proposed_action"], "risk_level": analysis["risk_level"], "abstained": analysis["abstain"]}, env_now, audience)
+        prev = state["last"]["answer"]
+        if now["primary_action"] == prev["primary_action"] and now["escalation_required"] == prev["escalation_required"]:
+            text = bot.follow_up(state["transcript"], prev, lang, state["model"])
+            state["transcript"].append({"role": "assistant", "text": text})
+            state["debug"] = _debug(state, analysis, degraded, env_now)
+            return {"type": "message", "text": text}
+
+    # Free text only (the web demo): if the user has not said what happened yet, ask an open question first.
+    # Never in the kit's simulation, where the user only answers fact questions.
+    if (case["case_id"].startswith("DEMO-") and analysis["clarify"] and not state["last"] and not force_final
+            and state["clarified"] < MAX_CLARIFY and analysis["proposed_action"] != "decline_out_of_scope"):
+        state["clarified"] += 1
+        state["transcript"].append({"role": "assistant", "text": analysis["clarify"]})
+        state["debug"] = _debug(state, analysis, degraded)
+        return {"type": "question", "text": analysis["clarify"], "topics": []}
+
     # Decisive facts still unknown (ordered by priority); ask about the first one we have not asked yet.
     env0 = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])
     unknown = env0["ask"]
@@ -139,7 +161,7 @@ def _advance(state, force_final):
         return {"type": "question", "text": text, "topics": [topic]}
 
     # Final answer. A fact we already asked about but is still unclear is treated as the riskier branch.
-    assume = [s for s in unknown if rules.SLOT_TOPIC[s] in state["asked"]]
+    assume = env_assumed(analysis, state, unknown)
     env = rules.evaluate(analysis["facts"], view["signals"], audience, assume=assume, benign=analysis["benign"])
     answer = bot.compose_answer(dict(case, language=lang), analysis, degraded, view, state["revealed"], env, [],
                                 state["model"], "multi_turn", state["consent_requested"])
@@ -147,6 +169,12 @@ def _advance(state, force_final):
     state["last"] = {"analysis": analysis, "answer": answer}
     state["debug"] = _debug(state, analysis, degraded, env)
     return {"type": "final", "answer": answer}
+
+
+def env_assumed(analysis, state, unknown=None):
+    """Facts we already asked about that are still unclear: treated as the riskier branch."""
+    unknown = unknown if unknown is not None else [s for s in rules.DECISIVE if analysis["facts"].get(s) == "unknown"]
+    return [s for s in unknown if rules.SLOT_TOPIC[s] in state["asked"]]
 
 
 def _debug(state, analysis, degraded, env=None):

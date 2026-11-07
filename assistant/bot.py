@@ -22,9 +22,13 @@ BOOL_FACTS = ["self_initiated", "code_shared", "credentials_entered", "card_deta
               "remote_access_given", "login_prompts_unrequested", "operator_change", "monitoring_suspected", "out_of_scope_request", "requests_sensitive_action"]
 CHOICES = {"code_for": {"operator", "bank", "other"}, "credentials_kind": {"bank_or_id", "other"},
            "lure_type": {"small_payment_or_card", "credentials_or_transfer", "other"}}
-MAX_QUESTIONS = 2  # at most this many questions per answer / conversation (fewer questions = fewer "unnecessary" ones)
+MAX_QUESTIONS = 2  # at most this many questions per conversation (fewer questions = fewer "unnecessary" ones)
+MAX_TOPICS = 3  # the evaluator treats more than three topics in one answer (counted from the question wording too) as fishing
 # The kit has no question wording for this topic, so we supply it.
-EXTRA_QUESTIONS = {"remote_access_given": {"fi": "Annoitko jollekulle etäkäytön laitteeseesi?", "en": "Did you let anyone control your device remotely?",
+EXTRA_QUESTIONS = {"user_safety": {"fi": "Oletko nyt turvassa, ja onko jollain läheiselläsi pääsy puhelimeesi?",
+                                   "en": "Are you safe right now, and could someone close to you have access to your phone?",
+                                   "sv": "Är du trygg just nu, och kan någon nära dig ha tillgång till din telefon?"},
+                   "remote_access_given": {"fi": "Annoitko jollekulle etäkäytön laitteeseesi?", "en": "Did you let anyone control your device remotely?",
                                            "sv": "Gav du någon fjärråtkomst till din enhet?"}}
 
 
@@ -72,7 +76,9 @@ def _normalise(raw):
             "language": raw.get("language") if raw.get("language") in prompts.LANG_NAME else None,
             "proposed_action": raw.get("proposed_action") if raw.get("proposed_action") in ACTIONS else "verify_via_official_channel",
             "risk_level": risk if risk in rules.RISK else "medium", "benign": bool(raw.get("benign")),
-            "abstain": bool(raw.get("abstain")), "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)]}
+            "abstain": bool(raw.get("abstain")), "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)],
+            "key_steps": [s for s in raw.get("key_steps") or [] if isinstance(s, str)][:3],
+            "clarify": str(raw.get("clarify") or "").strip()[:300]}
 
 
 def analyze(view, gated_left, model, transcript=None, guidelines=None):
@@ -94,6 +100,19 @@ def question_text(topic, lang):
     """The question for a decisive topic, in the user's language (wording from the kit's baseline)."""
     q = kit.baseline.QUESTIONS.get(topic) or EXTRA_QUESTIONS.get(topic)
     return q.get(lang) or q["en"]
+
+
+def pick_questions(ask, lang):
+    """Single-turn: the decisive slots to ask about, at most MAX_QUESTIONS, stopping before the wording of the
+    questions touches more than MAX_TOPICS topics (each question's text can match several topics)."""
+    chosen, seen = [], set()
+    for s in ask[:MAX_QUESTIONS]:
+        t = seen | {rules.SLOT_TOPIC[s]} | kit.textcheck.topics_in(question_text(rules.SLOT_TOPIC[s], lang))
+        if chosen and len(t) > MAX_TOPICS:
+            break
+        chosen.append(s)
+        seen = t
+    return chosen
 
 
 def pick_passages(summary, action, lang, k=2):
@@ -134,12 +153,12 @@ def check_advice(advice, steps, lang, action, core, monitoring=False):
     return problems
 
 
-def write_advice(lang, audience, final, env, analysis, topics, passages, model):
+def write_advice(lang, audience, final, env, analysis, topics, passages, model, signals=None):
     """Have the LLM write the advice for the decided action. Returns (advice, steps, used_fallback)."""
-    core, _ = prompts.steps_for(final["primary_action"])
+    core, _ = prompts.steps_for(final["primary_action"], (), prompts.situation_steps(analysis, signals, final["primary_action"]))
     extra = []  # feedback messages added on the retry
     for _ in range(2):
-        text = llm.complete(prompts.writer_messages(lang, audience, final, env, analysis, topics, passages, extra), model=model, max_tokens=900)
+        text = llm.complete(prompts.writer_messages(lang, audience, final, env, analysis, topics, passages, extra, signals), model=model, max_tokens=900)
         try:
             out = parse_json(text)
             advice, steps = str(out["advice_text"]).strip(), [str(s) for s in out.get("steps") or []][:5]
@@ -154,6 +173,21 @@ def write_advice(lang, audience, final, env, analysis, topics, passages, model):
                  {"role": "user", "content": "Rejected: " + "; ".join(problems) + ". Rewrite and return only the JSON object."}]
     # Both attempts failed: use the kit's ready-made template for this action.
     return kit.baseline.TEMPL[final["primary_action"]].get(lang) or kit.baseline.TEMPL[final["primary_action"]]["en"], [], True
+
+
+def follow_up(transcript, answer, lang, model):
+    """A short reply to a message after the advice was given, checked for unsafe claims and language.
+    Falls back to repeating the steps if the reply fails the checks twice."""
+    msgs = prompts.followup_messages(lang, transcript, answer)
+    for _ in range(2):
+        text = re.sub(r"<think>.*?</think>", "", llm.complete(msgs, model=model, max_tokens=400), flags=re.S).strip()
+        bad = kit.textcheck.find_unsafe(text, list(prompts.ALWAYS_BAN), lang)
+        det = kit.textcheck.detect_language(text)
+        if text and not bad and det in (None, lang, "mixed"):
+            return text
+        msgs = msgs + [{"role": "assistant", "content": text},
+                       {"role": "user", "content": "Rejected: write only in %s and never suggest risky actions. Rewrite." % prompts.LANG_NAME[lang]}]
+    return "\n".join(answer["steps"]) or answer["advice_text"]
 
 
 def confidence(final, analysis, env, degraded, fallback):
@@ -187,7 +221,7 @@ def compose_answer(case, analysis, degraded, view, revealed, env, topics, model,
     final = rules.clamp({"primary_action": analysis["proposed_action"], "risk_level": analysis["risk_level"], "abstained": analysis["abstain"]},
                         env, audience)
     cite_ids, passages = pick_passages(analysis["summary"], final["primary_action"], lang)
-    advice, steps, fallback = write_advice(lang, audience, final, env, analysis, topics, passages, model)
+    advice, steps, fallback = write_advice(lang, audience, final, env, analysis, topics, passages, model, view["signals"])
     questions = [question_text(t, lang) for t in topics]
     if questions:
         advice += "\n" + "\n".join(questions)
@@ -201,6 +235,35 @@ def compose_answer(case, analysis, degraded, view, revealed, env, topics, model,
         "notes": json.dumps({"rules": env["reasons"], "proposed": analysis["proposed_action"], "degraded": degraded, "fallback": fallback,
                              "lang": lang, "facts": {k: v for k, v in analysis["facts"].items() if v != "na"}}),
     }
+
+
+# In single-turn the user cannot have answered anything yet, but the LLM often reads "he asked me to read out the code"
+# as code_shared=yes, or "I didn't order this" into a twin whose input never says so. These two facts decide twin cases,
+# so in single-turn we keep asking about them (the advice still assumes the riskier answer).
+SINGLE_TURN_RECHECK = {"self_initiated": "no", "code_shared": "yes"}
+OVERRIDE_SLOTS = {"money_transferred"}
+
+
+def single_turn_envelope(analysis, signals, audience, lang):
+    """(slots to ask about, envelope) for a single-turn answer.
+
+    Unknown decisive facts are asked, and the advice covers their riskier answer. A rule that fires ONLY because of
+    such an assumption adds its handoff and its steps (as conditional advice) but does not replace the action the
+    analysis chose: assuming "you probably typed your password" turned 'delete this scam' into 'call your bank' far
+    more often than it helped (offline re-scoring of the dev run)."""
+    facts = dict(analysis["facts"])
+    for slot, val in SINGLE_TURN_RECHECK.items():
+        # self_initiated only matters when something changed (SIM/eSIM, order, login prompts); elsewhere leave it alone.
+        relevant = slot != "self_initiated" or facts["operator_change"] != "na" or facts["login_prompts_unrequested"] != "na"
+        if facts.get(slot) == val and relevant:
+            facts[slot] = "unknown"
+    known = rules.evaluate(facts, signals, audience, benign=analysis["benign"])
+    ask = pick_questions(known["ask"], lang)
+    env = rules.evaluate(facts, signals, audience, assume=ask, benign=analysis["benign"])
+    if env["forced_action"] and not known["forced_action"]:
+        env = dict(env, forced_action=None, risk_floor="none",
+                   also_actions=list(dict.fromkeys([env["forced_action"]] + env["also_actions"])))
+    return ask, env
 
 
 def answer_single_turn(case, model=None):
@@ -217,8 +280,6 @@ def answer_single_turn(case, model=None):
         analysis, degraded = analyze(build_view(case, revealed), [p for p in gated if p not in revealed], model)
     view = build_view(case, revealed)
 
-    # Ask about (and, in the advice, assume the riskier answer for) the top unknown decisive facts.
-    ask = rules.evaluate(analysis["facts"], view["signals"], case["audience"], benign=analysis["benign"])["ask"][:MAX_QUESTIONS]
-    env = rules.evaluate(analysis["facts"], view["signals"], case["audience"], assume=ask, benign=analysis["benign"])
+    ask, env = single_turn_envelope(analysis, view["signals"], case["audience"], case["language"])
     topics = [rules.SLOT_TOPIC[s] for s in ask]
     return compose_answer(case, analysis, degraded, view, revealed, env, topics, model, "single_turn", revealed - pre)

@@ -27,7 +27,9 @@ def make_case(gated=(), pre=()):
 
 def fake_compose(case, analysis_, degraded, view, revealed, env, topics, model, mode, consent_requested):
     """Stands in for the LLM writer: reports which rules fired so tests can check the decision."""
-    return {"advice_text": "final", "reasons": env["reasons"], "consent_requested_for": sorted(consent_requested)}
+    final = bot.rules.clamp({"primary_action": analysis_["proposed_action"], "risk_level": analysis_["risk_level"]}, env)
+    return {"advice_text": "final", "reasons": env["reasons"], "consent_requested_for": sorted(consent_requested),
+            "primary_action": final["primary_action"], "escalation_required": final["escalation_required"], "steps": []}
 
 
 class DialogueTest(unittest.TestCase):
@@ -35,7 +37,8 @@ class DialogueTest(unittest.TestCase):
         """Feed events to dialogue.step with canned analyses; return the list of replies."""
         queue = list(analyses)
         state, replies = {}, []
-        with mock.patch.object(bot, "analyze", lambda *a, **k: queue.pop(0)), mock.patch.object(bot, "compose_answer", fake_compose):
+        with mock.patch.object(bot, "analyze", lambda *a, **k: queue.pop(0)), mock.patch.object(bot, "compose_answer", fake_compose), \
+                mock.patch.object(bot, "follow_up", lambda *a, **k: "follow-up"):
             for ev in [{"type": "start", "case": case}] + events:
                 replies.append(dialogue.step(ev, state))
         return replies
@@ -57,7 +60,22 @@ class DialogueTest(unittest.TestCase):
         unknown = analysis({"code_shared": "unknown"})
         replies = self.run_events(make_case(), [unknown, unknown, unknown],
                                   [{"type": "user_reply", "text": "?"}, {"type": "user_reply", "text": "?"}])
-        self.assertEqual([r["type"] for r in replies], ["question", "final", "final"])
+        self.assertEqual([r["type"] for r in replies], ["question", "final", "message"])  # after the answer: a follow-up reply
+
+    def test_new_fact_after_the_answer_gives_a_new_answer(self):
+        replies = self.run_events(make_case(), [analysis(), analysis({"code_shared": "yes", "code_for": "bank"})],
+                                  [{"type": "user_reply", "text": "actually I gave them the code"}])
+        self.assertEqual([r["type"] for r in replies], ["final", "final"])
+        self.assertEqual(replies[1]["answer"]["reasons"], ["R1"])
+
+    def test_free_text_asks_what_happened_first(self):
+        vague = bot._normalise({"facts": {}, "clarify": "What did the message say?"}), False
+        case = dict(make_case(), case_id="DEMO-1")
+        replies = self.run_events(case, [vague, analysis()], [{"type": "user_reply", "text": "it asked me to pay 2 euros"}])
+        self.assertEqual([r["type"] for r in replies], ["question", "final"])
+        self.assertEqual(replies[0]["text"], "What did the message say?")
+        # the kit's simulation (non-demo cases) never gets the open question
+        self.assertEqual(self.run_events(make_case(), [vague], [])[0]["type"], "final")
 
     def test_consent_asked_once_and_pre_granted_signals_are_released_silently(self):
         case = make_case(["subscription.recent_events", "operator_account.recent_logins"], ["operator_account.recent_logins"])

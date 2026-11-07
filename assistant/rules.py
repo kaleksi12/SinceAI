@@ -25,6 +25,7 @@ DECISIVE = ["self_initiated", "code_shared", "credentials_entered", "card_detail
 # Slot name -> the kit's question topic (money_transferred is scored under "payment_status").
 SLOT_TOPIC = {s: s for s in DECISIVE}
 SLOT_TOPIC["money_transferred"] = "payment_status"
+SLOT_TOPIC["user_safety"] = "user_safety"  # not a fact slot: always asked when monitoring by someone close is suspected
 
 # In the dev data these actions always carry a human handoff.
 ALWAYS_ESCALATE = {"isolate_device_and_scan", "escalate_to_human"}
@@ -78,9 +79,14 @@ def evaluate(facts, signals=None, audience="consumer", assume=(), benign=False):
 
     # Decisive facts we still do not know, in priority order: these become questions.
     ask = [s for s in DECISIVE if f[s] == "unknown"]
+    if benign and f["self_initiated"] == "yes":
+        # Something the user arranged (a support session, a login they are making): do not quiz them about it.
+        ask = [s for s in ask if s not in ("remote_access_given", "app_installed", "credentials_entered")]
+    if f["monitoring_suspected"] == "yes":
+        ask.insert(0, "user_safety")  # safety first: removing a stalker app can alert the person watching
     # When nothing has been done yet, the lure tells which question matters most (card lure -> card details first).
     first = {"small_payment_or_card": ("card_details_entered", "money_transferred"), "credentials_or_transfer": ("credentials_entered",)}.get(f["lure_type"], ())
-    ask.sort(key=lambda s: s not in first)  # stable sort: only moves the lure-relevant slots to the front
+    ask.sort(key=lambda s: s != "user_safety" and s not in first)  # stable sort: only moves the lure-relevant slots to the front
     # "eff" is what the triggers below look at: assumed slots take their riskier value.
     eff = dict(f)
     for s in assume:
@@ -111,7 +117,8 @@ def evaluate(facts, signals=None, audience="consumer", assume=(), benign=False):
     elif eff["card_details_entered"] == "yes":
         add("R2", "contact_bank_and_block_cards", "critical")
     # R4: remote access given or an app installed: the device may be controlled, isolate it.
-    if eff["remote_access_given"] == "yes" or eff["app_installed"] == "yes":
+    # Not applied when the LLM judged it benign and the user arranged it (e.g. a support session they booked themselves).
+    if (eff["remote_access_given"] == "yes" or eff["app_installed"] == "yes") and not (benign and eff["self_initiated"] == "yes"):
         add("R4", "isolate_device_and_scan", "high", True, "business_security_support" if smb else "security_specialist")
     # R3: credentials typed into something suspicious: bank/ID logins go to the bank, others change the password.
     # Not applied when the LLM judged the case benign and the user started the login themselves.
@@ -153,6 +160,8 @@ def clamp(proposal, env, audience="consumer"):
         # A rule fired: its action wins, risk can only go up, escalation follows the rules.
         action = env["forced_action"]
         risk = _max_risk(risk, env["risk_floor"])
+        if action == "decline_out_of_scope":
+            risk = "medium"  # the decision is about the request (trace/expose someone), not a new incident
         escalate, target = env["escalate"], env["target"]
     else:
         if proposal.get("abstained"):
@@ -165,9 +174,10 @@ def clamp(proposal, env, audience="consumer"):
             risk = risk if risk in ("none", "low") else "low"
         elif env["lure_floor"] != "none":
             risk = _max_risk(risk, env["lure_floor"])
-        escalate = action in ALWAYS_ESCALATE
-        target = None
-        if escalate:
+        # A handoff can also come from a rule whose action was not forced (single-turn, riskier branch assumed).
+        escalate = action in ALWAYS_ESCALATE or env["escalate"]
+        target = env["target"]
+        if escalate and not target:
             target = "business_security_support" if audience == "small_business" else (
                 "security_specialist" if action == "isolate_device_and_scan" else "human_advisor")
     return {"primary_action": action, "risk_level": risk, "urgency": URGENCY[risk],

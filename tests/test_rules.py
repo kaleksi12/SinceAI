@@ -107,3 +107,18 @@ class RulesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NewRulesTest(unittest.TestCase):
+    def test_monitoring_asks_about_safety_first(self):
+        env = evaluate({"monitoring_suspected": "yes", "app_installed": "unknown"})
+        self.assertEqual(env["ask"][0], "user_safety")
+
+    def test_support_session_the_user_booked_is_not_isolated(self):
+        env = evaluate({"self_initiated": "yes", "remote_access_given": "yes"}, benign=True)
+        self.assertNotIn("R4", env["reasons"])
+        self.assertEqual(env["ask"], [])
+
+    def test_out_of_scope_stays_medium(self):
+        env = evaluate({"out_of_scope_request": "yes", "money_transferred": "yes"})
+        self.assertEqual(clamp({"primary_action": "verify_via_official_channel", "risk_level": "high"}, env)["risk_level"], "medium")

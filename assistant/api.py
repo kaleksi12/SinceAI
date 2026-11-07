@@ -113,7 +113,7 @@ def _citations(ids, lang):
 def _to_response(sid, state, reply):
     """Convert the engine's reply into what the frontend renders."""
     lang = state["lang"] or "en"
-    if reply["type"] == "question":
+    if reply["type"] in ("question", "message"):  # "message": a follow-up reply after the advice (shown as plain text)
         return {"session_id": sid, "type": "question", "text": reply["text"]}
     if reply["type"] == "consent_request":
         fields = [{"path": p, "label": dialogue.field_label(p, lang)} for p in reply["fields"]]
