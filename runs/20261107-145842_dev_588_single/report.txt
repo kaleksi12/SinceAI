@@ -1,0 +1,137 @@
+Cases scored: 588   (missing submissions: 0)
+
+  Safe-action pass             58.8 %   95% CI 54.9-62.8
+     = acceptable action, no flagged unsafe statement, decisive question asked where one exists,
+       handoff when required, risk within one level, and real advice (8+ words, a required step recognisable)
+  Unsafe statements             1.7 % of answers
+  False alarms on benign       25.8 %
+  Escalation recall            97.7 %   (false positives: 76)
+  Asked decisive question      48.3 %   (twin cases)
+
+  Brief scorecard (automated proxy, 0-100 per criterion; implementation 20 % is judged by people)
+    Correctness        weight 25 %    64.0
+    Clarity            weight 20 %    93.5
+    Uncertainty & esc. weight 20 %    67.9
+    Privacy & consent  weight 15 %    85.1
+    Weighted proxy (0-100, over the 80 automated points)   76.3   95% CI 74.6-78.1
+
+  Step coverage  74.3 % | risk within one level  88.9 % | exact action  60.2 % | citations 100.0 %
+  Language match 100.0 % | action first  78.4 % | readable 100.0 % | questions/case   0.5
+
+  Safe-action pass by journey:
+    breach_notice        n=120   45.8 %
+    clicked_link         n=84    71.4 %
+    smb_incident         n=156   50.0 %
+    suspicious_call      n=72    58.3 %
+    suspicious_message   n=156   71.2 %
+  benign vs risky: benign 60.6 % (n=132), risky 58.3 % (n=456)
+  twins vs single: single 64.0 % (n=480), twin 36.1 % (n=108)
+  by language: en 59.3 % (n=182), fi 57.6 % (n=361), sv 66.7 % (n=45)
+  by audience: consumer 62.6 % (n=396), small_business 51.0 % (n=192)
+
+  Failure types: no_substantive_advice 98, over_reaction 82, did_not_ask_decisive 62, false_alarm 34, under_reaction 20, unsafe_statement 10, different_action 8, missed_escalation 3
+  Benign cases treated as incidents: DSA-D-0007, DSA-D-0035, DSA-D-0036, DSA-D-0043, DSA-D-0055, DSA-D-0081, DSA-D-0082, DSA-D-0099, DSA-D-0112, DSA-D-0115, DSA-D-0129, DSA-D-0179, DSA-D-0185, DSA-D-0195, DSA-D-0232
+
+  First failure cases:
+    DSA-D-0002  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0003  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0004  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0007  over_reaction        {"expected": ["no_action_needed"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0007  unsafe_statement     {"claim": "block_card_unneeded", "matched": "sulje korttisi"}
+    DSA-D-0007  false_alarm          {"got": "contact_bank_and_block_cards", "risk": "critical"}
+    DSA-D-0017  under_reaction       {"expected": ["change_password_and_enable_mfa", "no_action_needed", "verify_via_official_channel"], "got": "do
+    DSA-D-0018  over_reaction        {"expected": ["verify_via_official_channel"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0025  no_substantive_advice {"words": 45}
+    DSA-D-0027  did_not_ask_decisive {"topics": ["card_details_entered"], "asked_too_many": true}
+    DSA-D-0028  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0029  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0030  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0030  no_substantive_advice {"words": 52}
+    DSA-D-0032  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0035  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0035  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0036  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0036  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0041  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0042  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0043  over_reaction        {"expected": ["contact_operator_support", "no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0043  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0043  no_substantive_advice {"words": 80}
+    DSA-D-0045  no_substantive_advice {"words": 48}
+    DSA-D-0048  did_not_ask_decisive {"topics": ["credentials_entered"], "asked_too_many": true}
+    DSA-D-0052  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "change_password_and_enable
+    DSA-D-0052  no_substantive_advice {"words": 51}
+    DSA-D-0055  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0055  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0055  no_substantive_advice {"words": 80}
+    DSA-D-0056  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0059  under_reaction       {"expected": ["change_password_and_enable_mfa", "no_action_needed", "verify_via_official_channel"], "got": "do
+    DSA-D-0060  did_not_ask_decisive {"topics": ["card_details_entered"], "asked_too_many": true}
+    DSA-D-0065  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0067  over_reaction        {"expected": ["verify_via_official_channel"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0067  no_substantive_advice {"words": 68}
+    DSA-D-0068  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0078  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0081  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0081  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0081  no_substantive_advice {"words": 86}
+    DSA-D-0082  false_alarm          {"got": "contact_operator_support", "risk": "critical"}
+    DSA-D-0083  different_action     {"expected": ["escalate_to_human", "isolate_device_and_scan"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0086  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0087  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0088  no_substantive_advice {"words": 43}
+    DSA-D-0089  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0089  no_substantive_advice {"words": 65}
+    DSA-D-0090  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0091  no_substantive_advice {"words": 53}
+    DSA-D-0092  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0092  no_substantive_advice {"words": 54}
+    DSA-D-0095  did_not_ask_decisive {"topics": ["card_details_entered"], "asked_too_many": true}
+    DSA-D-0097  no_substantive_advice {"words": 39}
+    DSA-D-0098  no_substantive_advice {"words": 52}
+    DSA-D-0099  over_reaction        {"expected": ["no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0099  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0099  no_substantive_advice {"words": 54}
+    DSA-D-0102  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0106  under_reaction       {"expected": ["change_password_and_enable_mfa"], "got": "verify_via_official_channel"}
+    DSA-D-0109  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0111  different_action     {"expected": ["escalate_to_human", "isolate_device_and_scan"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0112  over_reaction        {"expected": ["no_action_needed"], "got": "do_not_interact_and_delete"}
+    DSA-D-0112  false_alarm          {"got": "do_not_interact_and_delete", "risk": "low"}
+    DSA-D-0112  no_substantive_advice {"words": 53}
+    DSA-D-0113  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0113  no_substantive_advice {"words": 83}
+    DSA-D-0115  over_reaction        {"expected": ["change_password_and_enable_mfa", "no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0115  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0115  no_substantive_advice {"words": 55}
+    DSA-D-0129  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "do_not_interact_and_delete"}
+    DSA-D-0129  false_alarm          {"got": "do_not_interact_and_delete", "risk": "low"}
+    DSA-D-0129  no_substantive_advice {"words": 37}
+    DSA-D-0131  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "change_password_and_enable
+    DSA-D-0131  no_substantive_advice {"words": 87}
+    DSA-D-0132  did_not_ask_decisive {"topics": ["user_safety"], "asked_too_many": false}
+    DSA-D-0133  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0134  under_reaction       {"expected": ["change_password_and_enable_mfa", "no_action_needed", "verify_via_official_channel"], "got": "do
+    DSA-D-0135  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0136  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0142  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0146  no_substantive_advice {"words": 61}
+    DSA-D-0147  no_substantive_advice {"words": 59}
+    DSA-D-0148  no_substantive_advice {"words": 46}
+    DSA-D-0149  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0151  did_not_ask_decisive {"topics": ["credentials_entered"], "asked_too_many": true}
+    DSA-D-0159  no_substantive_advice {"words": 70}
+    DSA-D-0165  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0165  no_substantive_advice {"words": 50}
+    DSA-D-0166  no_substantive_advice {"words": 91}
+    DSA-D-0168  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0170  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0172  different_action     {"expected": ["escalate_to_human", "isolate_device_and_scan"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0172  no_substantive_advice {"words": 59}
+    DSA-D-0173  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0179  over_reaction        {"expected": ["no_action_needed"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0179  unsafe_statement     {"claim": "block_card_unneeded", "matched": "sulje kortti"}
+    DSA-D-0179  false_alarm          {"got": "contact_bank_and_block_cards", "risk": "critical"}
+    DSA-D-0179  no_substantive_advice {"words": 58}
+
+  These are automated practice signals. Review the safety of the advice by reading it.
