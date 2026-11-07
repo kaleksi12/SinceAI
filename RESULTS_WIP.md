@@ -61,6 +61,7 @@ We use all the signals defined in pre-existing signal dictionary, and the assist
 Ordinary consumers and small business owners can both access the assistant through either a DNA web portal or the My DNA mobile app, for example as part of the DNA Digiturva service.
 
 ## 9. Files
-- `test_predictions.jsonl`
+- Predictions for test cases: `test_predictions.jsonl`
+- Evalaution of predictions for 588 dev cases: `runs/20261107-194019_dev_588_single_callfix/report.txt`
 - Setup instructions: `README.md`
 - Report `RESULTS.md`
