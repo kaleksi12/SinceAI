@@ -1,14 +1,5 @@
 import { ShieldAlert } from "lucide-react";
-import type { AnswerCard as Answer, RiskLevel } from "@/lib/chatService";
-
-/** Badge colour per risk level (green = nothing to do, red = act now). */
-const riskStyle: Record<RiskLevel, string> = {
-  none: "bg-green-600",
-  low: "bg-green-600",
-  medium: "bg-yellow-500",
-  high: "bg-orange-500",
-  critical: "bg-red-600",
-};
+import type { AnswerCard as Answer } from "@/lib/chatService";
 
 const urgencyText: Record<Answer["urgency"], string> = {
   none: "No action needed",
@@ -36,8 +27,9 @@ const sourceLabel: Record<string, string> = {
 };
 
 /**
- * The structured part of a final answer: how serious it is, what to do, where the advice comes from,
- * and (only when the backend asks for it) a button to bring in a human.
+ * The structured part of a final answer: how soon to act, what to do, where the advice comes from,
+ * and (only when the backend asks for it) a button to bring in a human. The risk level is deliberately
+ * not shown to the user.
  */
 export function AnswerCard({
   answer,
@@ -50,12 +42,7 @@ export function AnswerCard({
 }) {
   return (
     <div className="mt-2 space-y-3 border-t border-border pt-2 text-xs text-muted-foreground">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className={`rounded-full px-2 py-0.5 font-semibold text-white ${riskStyle[answer.riskLevel]}`}>
-          Risk: {answer.riskLevel}
-        </span>
-        <span>{urgencyText[answer.urgency]}</span>
-      </div>
+      <p className="font-semibold text-foreground">{urgencyText[answer.urgency]}</p>
 
       {answer.steps.length > 0 && (
         <ol className="list-decimal space-y-1 pl-4 text-foreground">
