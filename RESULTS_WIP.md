@@ -58,7 +58,8 @@ We use all the signals defined in pre-existing signal dictionary, and the assist
 **NOTE:** The UI design does not sufficiently account for the privacy risks caused by dark patterns.
 
 ## 8. Packaging hypothesis for DNA (a hypothesis, not a result)
-Ordinary consumers and small business owners can both access the assistant through either a DNA web portal or the My DNA mobile app, for example as part of the DNA Digiturva service.
+
+Ordinary consumers and small business owners can access the assistant through either a web portal or the My DNA mobile app, for example as part of the DNA Digiturva service, or included in corporate data plans. An assistant with sufficiently reliable advice and wide coverage would help save customer service resources.
 
 ## 9. Files
 - Predictions for test cases: `test_predictions.jsonl`
