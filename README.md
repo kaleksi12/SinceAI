@@ -25,7 +25,7 @@ cp .env.example .env          # then set FEATHERLESS_API_KEY (and optionally LLM
 ## Run the app
 
 ```bash
-uvicorn assistant.api:app --reload --port 8000     # backend
+python3 -m uvicorn assistant.api:app --reload --port 8000     # backend
 cd frontend && bun install && bun run dev          # frontend (npm install / npm run dev also works)
 ```
 
