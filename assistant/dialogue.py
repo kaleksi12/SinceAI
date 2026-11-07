@@ -126,7 +126,7 @@ def _advance(state, force_final):
     audience = case["audience"]
 
     # Decisive facts still unknown (ordered by priority); ask about the first one we have not asked yet.
-    unknown = rules.evaluate(analysis["facts"], view["signals"], audience)["ask"]
+    unknown = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])["ask"]
     pending = [s for s in unknown if rules.SLOT_TOPIC[s] not in state["asked"]]
     if pending and not force_final and len(state["asked"]) < bot.MAX_QUESTIONS:
         topic = rules.SLOT_TOPIC[pending[0]]
@@ -137,7 +137,7 @@ def _advance(state, force_final):
 
     # Final answer. A fact we already asked about but is still unclear is treated as the riskier branch.
     assume = [s for s in unknown if rules.SLOT_TOPIC[s] in state["asked"]]
-    env = rules.evaluate(analysis["facts"], view["signals"], audience, assume=assume)
+    env = rules.evaluate(analysis["facts"], view["signals"], audience, assume=assume, benign=analysis["benign"])
     answer = bot.compose_answer(dict(case, language=lang), analysis, degraded, view, state["revealed"], env, [],
                                 state["model"], "multi_turn", state["consent_requested"])
     state["transcript"].append({"role": "assistant", "text": answer["advice_text"]})

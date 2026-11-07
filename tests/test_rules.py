@@ -34,6 +34,16 @@ class RulesTest(unittest.TestCase):
         self.assertEqual(env["reasons"], ["R2"])
         self.assertEqual(env["also_actions"], [])
 
+    def test_own_login_judged_benign_does_not_trigger_the_credentials_rule(self):
+        facts = {"credentials_entered": "yes", "self_initiated": "yes"}
+        self.assertEqual(evaluate(facts, benign=True)["reasons"], [])
+        self.assertEqual(evaluate(facts, benign=False)["reasons"], ["R3"])  # without the benign judgement the rule still fires
+        self.assertEqual(evaluate({"credentials_entered": "yes"}, benign=True)["reasons"], ["R3"])  # needs self_initiated too
+
+    def test_unrequested_login_prompts_force_a_password_change(self):
+        env = evaluate({"login_prompts_unrequested": "yes"})
+        self.assertEqual((env["forced_action"], env["risk_floor"]), ("change_password_and_enable_mfa", "high"))
+
     def test_card_lure_asks_about_card_details_before_credentials(self):
         facts = {"credentials_entered": "unknown", "card_details_entered": "unknown", "lure_type": "small_payment_or_card"}
         self.assertEqual(evaluate(facts)["ask"], ["card_details_entered", "credentials_entered"])

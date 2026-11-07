@@ -15,7 +15,7 @@ STEPS = {
     "no_action_needed": (["explain_benign"], ["verify_official_channel"]),
     "do_not_interact_and_delete": (["dont_open_link", "dont_pay_or_transfer"], ["delete_or_report_message", "hang_up_dont_call_back"]),
     "verify_via_official_channel": (["verify_official_channel", "dont_open_link"], ["dont_pay_or_transfer", "verify_out_of_band"]),
-    "change_password_and_enable_mfa": (["change_password", "review_sessions"], ["enable_mfa", "check_password_reuse", "use_trusted_device"]),
+    "change_password_and_enable_mfa": (["change_password", "review_sessions"], ["enable_mfa", "check_password_reuse", "use_trusted_device", "dont_approve_prompts"]),
     "contact_operator_support": (["contact_operator", "lock_subscription"], ["dont_share_codes", "contact_bank_now"]),
     "contact_bank_and_block_cards": (["contact_bank_now"], ["block_card", "report_police", "check_statements"]),
     "decline_out_of_scope": (["decline_request", "report_police"], []),
@@ -52,11 +52,12 @@ Return exactly one JSON object and nothing else:
 Facts:
 - self_initiated: the user (or a colleague) started the change or order themselves. When the user reports an unexpected SIM/eSIM change, order, login prompt or notice and does not say they caused it, this is "unknown" (never "no").
 - code_shared: a one-time code, PIN or confirmation code was given to someone.
-- credentials_entered: a username, password or login details were typed somewhere.
+- credentials_entered: the user typed a username, password or login details into a page, app or call that came from someone else (a message, a link, a caller). A normal login the user is doing themselves in a genuine service is NOT this: use "no".
 - card_details_entered: card or payment details were entered, or a payment was made.
 - money_transferred: money was already sent, paid or moved.
 - app_installed: an app, profile or program was installed.
 - remote_access_given: someone was given remote access or control.
+- login_prompts_unrequested: the user keeps receiving login approval prompts or codes they did not start (a sign that someone has their password).
 - operator_change: a SIM/eSIM change, number port, subscription order or loss of network service happened.
 - monitoring_suspected: someone close to the user may be monitoring their phone.
 - out_of_scope_request: the user asks the assistant to identify, trace, expose or retaliate against someone.

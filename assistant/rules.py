@@ -57,17 +57,19 @@ def _derive_operator_change(signals):
     return hit, used
 
 
-def evaluate(facts, signals=None, audience="consumer", assume=()):
+def evaluate(facts, signals=None, audience="consumer", assume=(), benign=False):
     """Return the envelope (the limits) for one situation.
 
     assume: slot names to treat as the RISKIER answer while they are still "unknown". Used for the
     slots we are asking about right now (single-turn: advise for the worse branch and ask; multi-turn:
-    after the user was asked but stayed vague). Unknown slots that are not assumed trigger nothing."""
+    after the user was asked but stayed vague). Unknown slots that are not assumed trigger nothing.
+    benign: the LLM judged the case harmless; together with self_initiated=yes it stops R3 (a normal login
+    the user is doing themselves must not be treated as typing credentials into a scam)."""
     # Missing slots default to "na" (not relevant).
     f = {k: facts.get(k, "na") for k in
          ("self_initiated", "code_shared", "code_for", "credentials_entered", "credentials_kind", "card_details_entered",
-          "money_transferred", "app_installed", "remote_access_given", "operator_change", "monitoring_suspected",
-          "out_of_scope_request", "requests_sensitive_action", "lure_type")}
+          "money_transferred", "app_installed", "remote_access_given", "login_prompts_unrequested", "operator_change",
+          "monitoring_suspected", "out_of_scope_request", "requests_sensitive_action", "lure_type")}
     smb = audience == "small_business"
     # Evidence in granted signals can confirm a SIM/eSIM event even if the user did not mention it.
     signal_change, used = _derive_operator_change(signals)
@@ -112,11 +114,15 @@ def evaluate(facts, signals=None, audience="consumer", assume=()):
     if eff["remote_access_given"] == "yes" or eff["app_installed"] == "yes":
         add("R4", "isolate_device_and_scan", "high", True, "business_security_support" if smb else "security_specialist")
     # R3: credentials typed into something suspicious: bank/ID logins go to the bank, others change the password.
-    if eff["credentials_entered"] == "yes":
+    # Not applied when the LLM judged the case benign and the user started the login themselves.
+    if eff["credentials_entered"] == "yes" and not (benign and eff["self_initiated"] == "yes"):
         if eff["credentials_kind"] == "bank_or_id":
             add("R3", "contact_bank_and_block_cards", "critical")
         else:
             add("R3", "change_password_and_enable_mfa", "high")
+    # R3b: login approval prompts the user did not start: someone probably has the password.
+    if eff["login_prompts_unrequested"] == "yes":
+        add("R3", "change_password_and_enable_mfa", "high")
 
     env = {"ask": ask, "ask_topics": [SLOT_TOPIC[s] for s in ask], "reasons": [t[0] for t in triggers],
            "signals_used": used, "forced_action": None, "also_actions": [], "risk_floor": "none",

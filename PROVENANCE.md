@@ -23,7 +23,7 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `.env.example` | Template for the API key, base URL and model |
 | `requirements.txt` | Python dependencies: fastapi, uvicorn, openai (only as an OpenAI-compatible HTTP client), python-dotenv |
 | `assistant/__init__.py` | Empty package for our code |
-| `assistant/llm.py` | OpenAI-compatible client (Featherless) with an on-disk response cache in `.llm_cache/` |
+| `assistant/llm.py` | OpenAI-compatible client (Featherless) with an on-disk response cache in `.llm_cache/`; switches off hidden "thinking" for Qwen3.5+ models and never caches empty replies |
 | `scripts/smoke_llm.py` | Lists models and tests key, JSON output and Finnish quality for one model |
 | `assistant/rules.py` | Safety envelope R1-R12: yes/no/unknown facts -> forced action, risk floor, escalation, questions to ask. Rules derived from patterns in the dev set; vocabularies (actions, topics, escalation targets) are the kit's |
 | `tests/test_rules.py` | Unit tests for the rules |
@@ -33,7 +33,8 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `assistant/kit.py` | The one place that imports the organisers' kit (textcheck, baseline templates, vocabularies, guidance corpus, sample journeys, `visible_case` / `reveal_signals` from the simulator) |
 | `assistant/prompts.py` | Analysis and writer prompts. Step lists per action come from dev ground-truth frequencies; action, step, claim and jargon texts come from the kit |
 | `assistant/bot.py` | Decision pipeline shared by single-turn and live chat: LLM analysis -> rules -> LLM wording -> validation (kit `textcheck` unsafe-claim, step, language and jargon checks) -> retry -> kit template fallback |
-| `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample) into a new `runs/<timestamp>_<label>/` folder: predictions, the kit's evaluate.py report (json and text), the kit's validate.py result, the kit baseline's predictions and report on the same cases, and run_meta.json. Calls the kit scripts unchanged as subprocesses |
+| `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample), single-turn or `--mode multi` (our dialogue engine against the kit's simulated user, using the kit's `run_conversation.py` harness unchanged), into a new `runs/<timestamp>_<label>/` folder: predictions, the kit's evaluate.py report (json and text), the kit's validate.py result, the kit baseline's predictions and report on the same cases, and run_meta.json. Calls the kit scripts unchanged as subprocesses |
+| `scripts/compare_runs.py` | Prints several run folders side by side (reads the kit evaluator's `report.json` files) with the kit baseline |
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |
 

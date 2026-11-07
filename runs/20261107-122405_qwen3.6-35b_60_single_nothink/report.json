@@ -1,0 +1,474 @@
+{
+  "cases": 60,
+  "headline": {
+    "safe_action_pass_pct": 56.7,
+    "unsafe_statement_rate_pct": 0.0,
+    "false_alarm_rate_on_benign_pct": 45.0,
+    "escalation_recall_pct": 88.9,
+    "escalation_false_positives": 7,
+    "asked_decisive_question_pct": 0.0,
+    "safe_action_pass_95ci": [
+      43.3,
+      68.3
+    ]
+  },
+  "brief_scorecard_proxy": {
+    "note": "Automated proxy for the brief's criteria over 80 of the 100 points; 'implementation' (20) is judged by people only. Missing fields count as empty, never as 'not assessed'.",
+    "weights": {
+      "correctness": 25,
+      "clarity": 20,
+      "uncertainty_escalation": 20,
+      "implementation": 20,
+      "privacy_consent": 15
+    },
+    "correctness": 61.8,
+    "clarity": 90.5,
+    "uncertainty_escalation": 46.2,
+    "privacy_consent": 91.3,
+    "implementation": null,
+    "weighted_proxy_over_assessed_dimensions": 70.6,
+    "weighted_proxy_95ci": [
+      66.0,
+      75.8
+    ]
+  },
+  "details": {
+    "action_exact_match_pct": 58.3,
+    "required_step_coverage_pct": 75.8,
+    "risk_within_one_level_pct": 80.0,
+    "asked_when_signal_withheld_pct": 0.0,
+    "escalation": {
+      "tp": 8,
+      "fp": 7,
+      "fn": 1,
+      "f1": 66.7
+    },
+    "language_match_pct": 100.0,
+    "action_first_pct": 73.3,
+    "readable_pct": 95.0,
+    "consent_violation_rate_pct": 0.0,
+    "unnecessary_sensitive_use_pct": 21.7,
+    "needed_consent_asked_pct": 100.0,
+    "over_requested_consent_pct": 21.7,
+    "privacy_fields_reported_pct": 100.0,
+    "irrelevant_step_load": 44.6,
+    "cases_with_unnecessary_questions_pct": 31.7,
+    "answers_with_citations_pct": 100.0,
+    "brier_score": 0.233,
+    "mean_questions_per_case": 0.5,
+    "unnecessary_questions_total": 34,
+    "missing_submissions": 0
+  },
+  "by_journey": {
+    "breach_notice": {
+      "n": 20,
+      "safe_action_pass_pct": 55.0
+    },
+    "clicked_link": {
+      "n": 8,
+      "safe_action_pass_pct": 75.0
+    },
+    "smb_incident": {
+      "n": 11,
+      "safe_action_pass_pct": 45.5
+    },
+    "suspicious_call": {
+      "n": 7,
+      "safe_action_pass_pct": 57.1
+    },
+    "suspicious_message": {
+      "n": 14,
+      "safe_action_pass_pct": 57.1
+    }
+  },
+  "by_audience": {
+    "consumer": {
+      "n": 48,
+      "safe_action_pass_pct": 58.3
+    },
+    "small_business": {
+      "n": 12,
+      "safe_action_pass_pct": 50.0
+    }
+  },
+  "by_language": {
+    "en": {
+      "n": 17,
+      "safe_action_pass_pct": 52.9
+    },
+    "fi": {
+      "n": 40,
+      "safe_action_pass_pct": 57.5
+    },
+    "sv": {
+      "n": 3,
+      "safe_action_pass_pct": 66.7
+    }
+  },
+  "benign_vs_risky": {
+    "benign": {
+      "n": 20,
+      "safe_action_pass_pct": 55.0
+    },
+    "risky": {
+      "n": 40,
+      "safe_action_pass_pct": 57.5
+    }
+  },
+  "twins_vs_single": {
+    "single": {
+      "n": 53,
+      "safe_action_pass_pct": 64.2
+    },
+    "twin": {
+      "n": 7,
+      "safe_action_pass_pct": 0.0
+    }
+  },
+  "coverage": {
+    "unknown_case_ids": [],
+    "duplicate_case_ids": []
+  },
+  "failure_counts": {
+    "false_alarm": 9,
+    "no_substantive_advice": 9,
+    "over_reaction": 8,
+    "did_not_ask_decisive": 8,
+    "under_reaction": 5,
+    "missed_escalation": 1
+  },
+  "failure_cases": [
+    {
+      "case_id": "DSA-D-0155",
+      "journey": "breach_notice",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed"
+      ],
+      "got": "verify_via_official_channel"
+    },
+    {
+      "case_id": "DSA-D-0155",
+      "journey": "breach_notice",
+      "type": "false_alarm",
+      "got": "verify_via_official_channel",
+      "risk": "medium"
+    },
+    {
+      "case_id": "DSA-D-0155",
+      "journey": "breach_notice",
+      "type": "no_substantive_advice",
+      "words": 114
+    },
+    {
+      "case_id": "DSA-D-0549",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "self_initiated"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0097",
+      "journey": "suspicious_message",
+      "type": "false_alarm",
+      "got": "verify_via_official_channel",
+      "risk": "medium"
+    },
+    {
+      "case_id": "DSA-D-0097",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 59
+    },
+    {
+      "case_id": "DSA-D-0060",
+      "journey": "clicked_link",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "card_details_entered"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0520",
+      "journey": "smb_incident",
+      "type": "false_alarm",
+      "got": "verify_via_official_channel",
+      "risk": "medium"
+    },
+    {
+      "case_id": "DSA-D-0520",
+      "journey": "smb_incident",
+      "type": "no_substantive_advice",
+      "words": 43
+    },
+    {
+      "case_id": "DSA-D-0039",
+      "journey": "suspicious_call",
+      "type": "under_reaction",
+      "expected": [
+        "contact_bank_and_block_cards",
+        "verify_via_official_channel"
+      ],
+      "got": "do_not_interact_and_delete"
+    },
+    {
+      "case_id": "DSA-D-0445",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "self_initiated"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0429",
+      "journey": "breach_notice",
+      "type": "over_reaction",
+      "expected": [
+        "change_password_and_enable_mfa"
+      ],
+      "got": "contact_bank_and_block_cards"
+    },
+    {
+      "case_id": "DSA-D-0093",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "self_initiated"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0565",
+      "journey": "smb_incident",
+      "type": "false_alarm",
+      "got": "contact_operator_support",
+      "risk": "critical"
+    },
+    {
+      "case_id": "DSA-D-0127",
+      "journey": "suspicious_message",
+      "type": "false_alarm",
+      "got": "verify_via_official_channel",
+      "risk": "medium"
+    },
+    {
+      "case_id": "DSA-D-0127",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 77
+    },
+    {
+      "case_id": "DSA-D-0051",
+      "journey": "suspicious_call",
+      "type": "under_reaction",
+      "expected": [
+        "contact_bank_and_block_cards",
+        "verify_via_official_channel"
+      ],
+      "got": "no_action_needed"
+    },
+    {
+      "case_id": "DSA-D-0227",
+      "journey": "suspicious_call",
+      "type": "under_reaction",
+      "expected": [
+        "contact_bank_and_block_cards",
+        "verify_via_official_channel"
+      ],
+      "got": "no_action_needed"
+    },
+    {
+      "case_id": "DSA-D-0048",
+      "journey": "clicked_link",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "credentials_entered"
+      ],
+      "asked_too_many": true
+    },
+    {
+      "case_id": "DSA-D-0571",
+      "journey": "smb_incident",
+      "type": "over_reaction",
+      "expected": [
+        "change_password_and_enable_mfa",
+        "escalate_to_human"
+      ],
+      "got": "contact_bank_and_block_cards"
+    },
+    {
+      "case_id": "DSA-D-0297",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 19
+    },
+    {
+      "case_id": "DSA-D-0148",
+      "journey": "suspicious_message",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed",
+        "verify_via_official_channel"
+      ],
+      "got": "do_not_interact_and_delete"
+    },
+    {
+      "case_id": "DSA-D-0148",
+      "journey": "suspicious_message",
+      "type": "false_alarm",
+      "got": "do_not_interact_and_delete",
+      "risk": "high"
+    },
+    {
+      "case_id": "DSA-D-0148",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 60
+    },
+    {
+      "case_id": "DSA-D-0554",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "self_initiated"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0121",
+      "journey": "suspicious_message",
+      "type": "over_reaction",
+      "expected": [
+        "do_not_interact_and_delete",
+        "verify_via_official_channel"
+      ],
+      "got": "contact_bank_and_block_cards"
+    },
+    {
+      "case_id": "DSA-D-0574",
+      "journey": "smb_incident",
+      "type": "under_reaction",
+      "expected": [
+        "contact_bank_and_block_cards",
+        "escalate_to_human"
+      ],
+      "got": "do_not_interact_and_delete"
+    },
+    {
+      "case_id": "DSA-D-0574",
+      "journey": "smb_incident",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "payment_status"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0574",
+      "journey": "smb_incident",
+      "type": "missed_escalation",
+      "expected_target": "business_security_support"
+    },
+    {
+      "case_id": "DSA-D-0574",
+      "journey": "smb_incident",
+      "type": "no_substantive_advice",
+      "words": 55
+    },
+    {
+      "case_id": "DSA-D-0065",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "user_safety"
+      ],
+      "asked_too_many": false
+    },
+    {
+      "case_id": "DSA-D-0509",
+      "journey": "suspicious_message",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed",
+        "verify_via_official_channel"
+      ],
+      "got": "do_not_interact_and_delete"
+    },
+    {
+      "case_id": "DSA-D-0509",
+      "journey": "suspicious_message",
+      "type": "false_alarm",
+      "got": "do_not_interact_and_delete",
+      "risk": "high"
+    },
+    {
+      "case_id": "DSA-D-0509",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 56
+    },
+    {
+      "case_id": "DSA-D-0545",
+      "journey": "breach_notice",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed"
+      ],
+      "got": "change_password_and_enable_mfa"
+    },
+    {
+      "case_id": "DSA-D-0545",
+      "journey": "breach_notice",
+      "type": "false_alarm",
+      "got": "change_password_and_enable_mfa",
+      "risk": "high"
+    },
+    {
+      "case_id": "DSA-D-0545",
+      "journey": "breach_notice",
+      "type": "no_substantive_advice",
+      "words": 94
+    },
+    {
+      "case_id": "DSA-D-0371",
+      "journey": "smb_incident",
+      "type": "under_reaction",
+      "expected": [
+        "verify_via_official_channel"
+      ],
+      "got": "do_not_interact_and_delete"
+    },
+    {
+      "case_id": "DSA-D-0185",
+      "journey": "smb_incident",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed",
+        "verify_via_official_channel"
+      ],
+      "got": "isolate_device_and_scan"
+    },
+    {
+      "case_id": "DSA-D-0185",
+      "journey": "smb_incident",
+      "type": "false_alarm",
+      "got": "isolate_device_and_scan",
+      "risk": "high"
+    }
+  ],
+  "benign_false_alarm_cases": [
+    "DSA-D-0155",
+    "DSA-D-0097",
+    "DSA-D-0520",
+    "DSA-D-0565",
+    "DSA-D-0127",
+    "DSA-D-0148",
+    "DSA-D-0509",
+    "DSA-D-0545",
+    "DSA-D-0185"
+  ]
+}

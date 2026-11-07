@@ -19,7 +19,7 @@ GATED = "available_with_consent"  # placeholder for a signal the user has not al
 ACTIONS = set(kit.ref("action_vocabulary.json")["actions"])
 YNU = {"yes", "no", "unknown", "na"}  # allowed values of a yes/no slot
 BOOL_FACTS = ["self_initiated", "code_shared", "credentials_entered", "card_details_entered", "money_transferred", "app_installed",
-              "remote_access_given", "operator_change", "monitoring_suspected", "out_of_scope_request", "requests_sensitive_action"]
+              "remote_access_given", "login_prompts_unrequested", "operator_change", "monitoring_suspected", "out_of_scope_request", "requests_sensitive_action"]
 CHOICES = {"code_for": {"operator", "bank", "other"}, "credentials_kind": {"bank_or_id", "other"},
            "lure_type": {"small_payment_or_card", "credentials_or_transfer", "other"}}
 MAX_QUESTIONS = 2  # at most this many questions per answer / conversation (fewer questions = fewer "unnecessary" ones)
@@ -217,7 +217,7 @@ def answer_single_turn(case, model=None):
     view = build_view(case, revealed)
 
     # Ask about (and, in the advice, assume the riskier answer for) the top unknown decisive facts.
-    ask = rules.evaluate(analysis["facts"], view["signals"], case["audience"])["ask"][:MAX_QUESTIONS]
-    env = rules.evaluate(analysis["facts"], view["signals"], case["audience"], assume=ask)
+    ask = rules.evaluate(analysis["facts"], view["signals"], case["audience"], benign=analysis["benign"])["ask"][:MAX_QUESTIONS]
+    env = rules.evaluate(analysis["facts"], view["signals"], case["audience"], assume=ask, benign=analysis["benign"])
     topics = [rules.SLOT_TOPIC[s] for s in ask]
     return compose_answer(case, analysis, degraded, view, revealed, env, topics, model, "single_turn", revealed - pre)

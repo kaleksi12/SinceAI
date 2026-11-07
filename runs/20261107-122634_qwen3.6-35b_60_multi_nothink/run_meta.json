@@ -1,0 +1,16 @@
+{
+  "started": "2026-11-07T12:27:35",
+  "model": "Qwen/Qwen3.6-35B-A3B",
+  "mode": "multi",
+  "cases_file": "simset\\data\\dev\\cases.jsonl",
+  "n_cases": 60,
+  "sample": 60,
+  "answers": 60,
+  "workers": 4,
+  "seconds": 62,
+  "llm_calls": 87,
+  "cache_hits": 109,
+  "writer_fallbacks": 6,
+  "degraded_analyses": 0,
+  "git": "444ad4a+uncommitted changes"
+}
