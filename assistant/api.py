@@ -35,6 +35,14 @@ JOURNEY_LABELS = {
     "breach_notice": "Breach notice or account takeover signs",
     "smb_incident": "Small-business incident",
 }
+# One English dev case per journey, so the demo's starter messages are in English.
+SAMPLE_CASE_IDS = {
+    "suspicious_message": "DSA-D-0324",
+    "clicked_link": "DSA-D-0079",
+    "suspicious_call": "DSA-D-0003",
+    "breach_notice": "DSA-D-0093",
+    "smb_incident": "DSA-D-0283",
+}
 TARGET_LABELS = {
     "operator_support_agent": {"en": "an operator support agent", "fi": "operaattorin asiakaspalvelija", "sv": "en operatörssupportagent"},
     "security_specialist": {"en": "a security specialist", "fi": "tietoturva-asiantuntija", "sv": "en säkerhetsspecialist"},
@@ -74,8 +82,10 @@ class EscalateRequest(BaseModel):
 # --- helpers --------------------------------------------------------------------------------------------------------
 
 def _scenarios():
-    """The sample journeys by id (the journey name). They are dev cases: we never send their ground truth anywhere."""
-    return {c["journey"]: c for c in kit.samples()}
+    """The sample journeys by id (the journey name). They are English dev cases, from the same scenario families as the
+    kit's five Finnish samples; we never send their ground truth anywhere."""
+    by_id = {c["case_id"]: c for c in kit.dev_cases()}
+    return {journey: by_id[case_id] for journey, case_id in SAMPLE_CASE_IDS.items()}
 
 
 def _free_case(audience):

@@ -38,6 +38,12 @@ def samples():
         return [json.loads(line) for line in f if line.strip()]
 
 
+def dev_cases():
+    """All dev cases (with ground truth: never send it anywhere)."""
+    with open(SIMSET / "data" / "dev" / "cases.jsonl", encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+
 def visible(case):
     """Only the fields a test input has: no labels, simulation facts, family or tags."""
     return {k: case[k] for k in VISIBLE_KEYS if k in case}
