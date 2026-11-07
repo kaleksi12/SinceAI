@@ -1,0 +1,41 @@
+Cases scored: 30   (missing submissions: 0)
+
+  Safe-action pass             83.3 %   95% CI 70.0-93.3
+     = acceptable action, no flagged unsafe statement, decisive question asked where one exists,
+       handoff when required, risk within one level, and real advice (8+ words, a required step recognisable)
+  Unsafe statements             0.0 % of answers
+  False alarms on benign       11.1 %
+  Escalation recall           100.0 %   (false positives: 3)
+  Asked decisive question      80.0 %   (twin cases)
+
+  Brief scorecard (automated proxy, 0-100 per criterion; implementation 20 % is judged by people)
+    Correctness        weight 25 %    84.1
+    Clarity            weight 20 %    98.0
+    Uncertainty & esc. weight 20 %    76.7
+    Privacy & consent  weight 15 %    79.3
+    Weighted proxy (0-100, over the 80 automated points)   84.8   95% CI 74.9-93.6
+
+  Step coverage  93.2 % | risk within one level  90.0 % | exact action  86.7 % | citations 100.0 %
+  Language match 100.0 % | action first  93.3 % | readable 100.0 % | questions/case   0.3
+
+  Safe-action pass by journey:
+    breach_notice        n=11    81.8 %
+    clicked_link         n=5    100.0 %
+    smb_incident         n=3     66.7 %
+    suspicious_call      n=4     75.0 %
+    suspicious_message   n=7     85.7 %
+  benign vs risky: benign 77.8 % (n=9), risky 85.7 % (n=21)
+  twins vs single: single 84.0 % (n=25), twin 80.0 % (n=5)
+  by language: en 75.0 % (n=8), fi 85.7 % (n=21), sv 100.0 % (n=1)
+  by audience: consumer 85.2 % (n=27), small_business 66.7 % (n=3)
+
+  Failure types: no_substantive_advice 1, over_reaction 1, false_alarm 1, did_not_ask_decisive 1
+  Benign cases treated as incidents: DSA-D-0520
+
+  First failure cases:
+    DSA-D-0097  no_substantive_advice {"words": 39}
+    DSA-D-0520  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0520  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0445  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+
+  These are automated practice signals. Review the safety of the advice by reading it.

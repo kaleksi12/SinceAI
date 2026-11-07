@@ -1,0 +1,48 @@
+Cases scored: 30   (missing submissions: 0)
+
+  Safe-action pass             66.7 %   95% CI 46.7-83.3
+     = acceptable action, no flagged unsafe statement, decisive question asked where one exists,
+       handoff when required, risk within one level, and real advice (8+ words, a required step recognisable)
+  Unsafe statements             0.0 % of answers
+  False alarms on benign       22.2 %
+  Escalation recall           100.0 %   (false positives: 5)
+  Asked decisive question      40.0 %   (twin cases)
+
+  Brief scorecard (automated proxy, 0-100 per criterion; implementation 20 % is judged by people)
+    Correctness        weight 25 %    71.2
+    Clarity            weight 20 %    95.0
+    Uncertainty & esc. weight 20 %    61.3
+    Privacy & consent  weight 15 %    74.7
+    Weighted proxy (0-100, over the 80 automated points)   75.3   95% CI 65.9-84.0
+
+  Step coverage  84.1 % | risk within one level  86.7 % | exact action  76.7 % | citations 100.0 %
+  Language match 100.0 % | action first  83.3 % | readable 100.0 % | questions/case   0.3
+
+  Safe-action pass by journey:
+    breach_notice        n=11    72.7 %
+    clicked_link         n=5     60.0 %
+    smb_incident         n=3     33.3 %
+    suspicious_call      n=4     75.0 %
+    suspicious_message   n=7     71.4 %
+  benign vs risky: benign 66.7 % (n=9), risky 66.7 % (n=21)
+  twins vs single: single 76.0 % (n=25), twin 20.0 % (n=5)
+  by language: en 50.0 % (n=8), fi 71.4 % (n=21), sv 100.0 % (n=1)
+  by audience: consumer 70.4 % (n=27), small_business 33.3 % (n=3)
+
+  Failure types: no_substantive_advice 4, did_not_ask_decisive 3, over_reaction 2, false_alarm 2
+  Benign cases treated as incidents: DSA-D-0520, DSA-D-0565
+
+  First failure cases:
+    DSA-D-0549  no_substantive_advice {"words": 89}
+    DSA-D-0097  no_substantive_advice {"words": 39}
+    DSA-D-0060  did_not_ask_decisive {"topics": ["card_details_entered"], "asked_too_many": true}
+    DSA-D-0520  over_reaction        {"expected": ["no_action_needed", "verify_via_official_channel"], "got": "isolate_device_and_scan"}
+    DSA-D-0520  false_alarm          {"got": "isolate_device_and_scan", "risk": "high"}
+    DSA-D-0089  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0089  no_substantive_advice {"words": 65}
+    DSA-D-0445  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0565  false_alarm          {"got": "contact_operator_support", "risk": "critical"}
+    DSA-D-0565  no_substantive_advice {"words": 77}
+    DSA-D-0048  did_not_ask_decisive {"topics": ["credentials_entered"], "asked_too_many": true}
+
+  These are automated practice signals. Review the safety of the advice by reading it.

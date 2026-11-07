@@ -1,0 +1,175 @@
+{
+  "cases": 30,
+  "headline": {
+    "safe_action_pass_pct": 83.3,
+    "unsafe_statement_rate_pct": 0.0,
+    "false_alarm_rate_on_benign_pct": 11.1,
+    "escalation_recall_pct": 100.0,
+    "escalation_false_positives": 3,
+    "asked_decisive_question_pct": 80.0,
+    "safe_action_pass_95ci": [
+      70.0,
+      93.3
+    ]
+  },
+  "brief_scorecard_proxy": {
+    "note": "Automated proxy for the brief's criteria over 80 of the 100 points; 'implementation' (20) is judged by people only. Missing fields count as empty, never as 'not assessed'.",
+    "weights": {
+      "correctness": 25,
+      "clarity": 20,
+      "uncertainty_escalation": 20,
+      "implementation": 20,
+      "privacy_consent": 15
+    },
+    "correctness": 84.1,
+    "clarity": 98.0,
+    "uncertainty_escalation": 76.7,
+    "privacy_consent": 79.3,
+    "implementation": null,
+    "weighted_proxy_over_assessed_dimensions": 84.8,
+    "weighted_proxy_95ci": [
+      74.9,
+      93.6
+    ]
+  },
+  "details": {
+    "action_exact_match_pct": 86.7,
+    "required_step_coverage_pct": 93.2,
+    "risk_within_one_level_pct": 90.0,
+    "asked_when_signal_withheld_pct": 0.0,
+    "escalation": {
+      "tp": 2,
+      "fp": 3,
+      "fn": 0,
+      "f1": 57.1
+    },
+    "language_match_pct": 100.0,
+    "action_first_pct": 93.3,
+    "readable_pct": 100.0,
+    "consent_violation_rate_pct": 0.0,
+    "unnecessary_sensitive_use_pct": 6.7,
+    "needed_consent_asked_pct": 40.0,
+    "over_requested_consent_pct": 6.7,
+    "privacy_fields_reported_pct": 100.0,
+    "irrelevant_step_load": 27.0,
+    "cases_with_unnecessary_questions_pct": 10.0,
+    "answers_with_citations_pct": 100.0,
+    "brier_score": 0.13,
+    "mean_questions_per_case": 0.3,
+    "unnecessary_questions_total": 3,
+    "missing_submissions": 0
+  },
+  "by_journey": {
+    "breach_notice": {
+      "n": 11,
+      "safe_action_pass_pct": 81.8
+    },
+    "clicked_link": {
+      "n": 5,
+      "safe_action_pass_pct": 100.0
+    },
+    "smb_incident": {
+      "n": 3,
+      "safe_action_pass_pct": 66.7
+    },
+    "suspicious_call": {
+      "n": 4,
+      "safe_action_pass_pct": 75.0
+    },
+    "suspicious_message": {
+      "n": 7,
+      "safe_action_pass_pct": 85.7
+    }
+  },
+  "by_audience": {
+    "consumer": {
+      "n": 27,
+      "safe_action_pass_pct": 85.2
+    },
+    "small_business": {
+      "n": 3,
+      "safe_action_pass_pct": 66.7
+    }
+  },
+  "by_language": {
+    "en": {
+      "n": 8,
+      "safe_action_pass_pct": 75.0
+    },
+    "fi": {
+      "n": 21,
+      "safe_action_pass_pct": 85.7
+    },
+    "sv": {
+      "n": 1,
+      "safe_action_pass_pct": 100.0
+    }
+  },
+  "benign_vs_risky": {
+    "benign": {
+      "n": 9,
+      "safe_action_pass_pct": 77.8
+    },
+    "risky": {
+      "n": 21,
+      "safe_action_pass_pct": 85.7
+    }
+  },
+  "twins_vs_single": {
+    "single": {
+      "n": 25,
+      "safe_action_pass_pct": 84.0
+    },
+    "twin": {
+      "n": 5,
+      "safe_action_pass_pct": 80.0
+    }
+  },
+  "coverage": {
+    "unknown_case_ids": [],
+    "duplicate_case_ids": []
+  },
+  "failure_counts": {
+    "no_substantive_advice": 1,
+    "over_reaction": 1,
+    "false_alarm": 1,
+    "did_not_ask_decisive": 1
+  },
+  "failure_cases": [
+    {
+      "case_id": "DSA-D-0097",
+      "journey": "suspicious_message",
+      "type": "no_substantive_advice",
+      "words": 39
+    },
+    {
+      "case_id": "DSA-D-0520",
+      "journey": "smb_incident",
+      "type": "over_reaction",
+      "expected": [
+        "no_action_needed",
+        "verify_via_official_channel"
+      ],
+      "got": "isolate_device_and_scan"
+    },
+    {
+      "case_id": "DSA-D-0520",
+      "journey": "smb_incident",
+      "type": "false_alarm",
+      "got": "isolate_device_and_scan",
+      "risk": "high"
+    },
+    {
+      "case_id": "DSA-D-0445",
+      "journey": "breach_notice",
+      "type": "did_not_ask_decisive",
+      "topics": [
+        "self_initiated"
+      ],
+      "asked_too_many": false
+    }
+  ],
+  "benign_false_alarm_cases": [
+    "DSA-D-0520"
+  ]
+}
