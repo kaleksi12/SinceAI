@@ -50,7 +50,8 @@ def main():
     cols = []
     for f in folders:
         report, meta = load(f)
-        label = "%s %s" % (meta["model"].split("/")[-1], meta.get("mode", "single"))
+        label = "%s %s%s" % (meta["model"].split("/")[-1], meta.get("mode", "single"),
+                             " optimized" if meta.get("guidelines", "default") != "default" else "")
         cols.append(column(report, meta, label))
     base = json.loads((Path(folders[0]) / "baseline_report.json").read_text(encoding="utf-8"))
     cols.append(column(base, None, "kit baseline (single)"))

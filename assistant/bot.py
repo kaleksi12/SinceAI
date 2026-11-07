@@ -75,11 +75,12 @@ def _normalise(raw):
             "abstain": bool(raw.get("abstain")), "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)]}
 
 
-def analyze(view, gated_left, model, transcript=None):
+def analyze(view, gated_left, model, transcript=None, guidelines=None):
     """Ask the LLM to analyse the situation. Returns (analysis, degraded).
 
-    degraded=True means the LLM never produced valid JSON and we fell back to cautious defaults."""
-    msgs = prompts.analysis_messages(view, gated_left, transcript)
+    degraded=True means the LLM never produced valid JSON and we fell back to cautious defaults.
+    guidelines: an alternative GUIDELINES text (prompt optimization); None uses the current one."""
+    msgs = prompts.analysis_messages(view, gated_left, transcript, guidelines)
     for _ in range(2):
         text = llm.complete(msgs, model=model, max_tokens=800)
         try:

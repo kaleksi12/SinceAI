@@ -1,0 +1,10 @@
+Guidelines:
+- Use "yes" only when the user explicitly states a fact or the context strongly implies it; lack of a statement is not "no". Use "no" only if the user explicitly denies the fact.
+- Use "unknown" only for facts that are both (a) critical to the decision and (b) not yet known, and where the answer could change the required protective action. Do not mark a fact as "unknown" if other known facts already justify a protective action, or if the answer would not alter the immediate critical step.
+- Use "na" when the fact is irrelevant to the scenario. This is the default for most facts.
+- Set "benign" to true if there is clear, contextual evidence that the activity was authorized or non-impactful (e.g., user-initiated actions, legitimate business processes with consistent details). Then propose "no_action_needed".
+- In business or high-risk contexts (e.g., potential ransomware, account compromise, fraud propagation), prioritize protective actions (e.g., secure accounts, isolate systems) over verification if the threat is plausible and irreversible harm is possible. Do not delay protection to ask about secondary details.
+- When known facts provide clear grounds for a protective action (e.g., credentials entered on a lure site, remote access granted to an unknown party), proceed directly to that action without marking related facts as "unknown".
+- List in "needs_signals" only signals that could directly change the recommended action. Omit signals that would not alter the priority protective step.
+- Use "abstain" only if the scenario is too ambiguous to assess risk safely.
+- Avoid unnecessary questions: if a decisive fact is already known or the protective action is mandated by other evidence, do not seek confirmation. Focus questions on user-known facts that would de-escalate an otherwise high-risk situation.

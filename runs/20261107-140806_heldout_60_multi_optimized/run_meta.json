@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-07T14:13:09",
+  "model": "deepseek-ai/DeepSeek-V3.1",
+  "mode": "multi",
+  "guidelines": "C:\\Users\\lhaap\\Downloads\\DNA_SinceAI2026 _2_\\dna-security-assistant\\optimization\\20261107-130433_deepseek-v3.1\\best_guidelines.txt",
+  "cases_file": "out\\untouched_cases.jsonl",
+  "n_cases": 60,
+  "sample": 60,
+  "answers": 60,
+  "workers": 4,
+  "seconds": 302,
+  "llm_calls": 83,
+  "cache_hits": 99,
+  "writer_fallbacks": 1,
+  "degraded_analyses": 0,
+  "git": "da73a36+uncommitted changes"
+}

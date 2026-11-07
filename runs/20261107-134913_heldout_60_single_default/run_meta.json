@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-07T13:55:32",
+  "model": "deepseek-ai/DeepSeek-V3.1",
+  "mode": "single",
+  "guidelines": "default",
+  "cases_file": "out\\untouched_cases.jsonl",
+  "n_cases": 60,
+  "sample": 60,
+  "answers": 60,
+  "workers": 4,
+  "seconds": 379,
+  "llm_calls": 118,
+  "cache_hits": 15,
+  "writer_fallbacks": 0,
+  "degraded_analyses": 0,
+  "git": "da73a36+uncommitted changes"
+}

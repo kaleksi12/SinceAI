@@ -24,7 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from assistant import bot, dialogue, llm  # noqa: E402
+from assistant import bot, dialogue, llm, prompts  # noqa: E402
 from sim import run_conversation as harness  # noqa: E402  (the kit's multi-turn harness; simset/ is on sys.path via assistant.kit)
 
 EVALUATE = ROOT / "simset" / "eval" / "evaluate.py"
@@ -87,6 +87,7 @@ def main():
     ap.add_argument("--cases", required=True)
     ap.add_argument("--model")
     ap.add_argument("--mode", choices=["single", "multi"], default="single")
+    ap.add_argument("--guidelines", help="text file that replaces prompts.GUIDELINES for this run (e.g. a prompt optimization result)")
     ap.add_argument("--name", help="label for the run folder (default: model name and number of cases)")
     ap.add_argument("--runs-dir", default=str(ROOT / "runs"))
     ap.add_argument("--sample", type=int, default=0, help="random sample of N cases (seed 7)")
@@ -95,6 +96,8 @@ def main():
     a = ap.parse_args()
 
     model = a.model or os.environ.get("LLM_MODEL", "unknown")
+    if a.guidelines:  # analyze() reads prompts.GUIDELINES at call time, so this also covers the live-chat engine
+        prompts.GUIDELINES = Path(a.guidelines).read_text(encoding="utf-8")
     cases = [json.loads(line) for line in open(a.cases, encoding="utf-8") if line.strip()]
     if a.sample:
         cases = random.Random(7).sample(cases, a.sample)
@@ -118,7 +121,7 @@ def main():
     preds.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in ok), encoding="utf-8")
     cases_path.write_text("".join(json.dumps(c, ensure_ascii=False) + "\n" for c in cases), encoding="utf-8")
 
-    meta = {"started": datetime.now().isoformat(timespec="seconds"), "model": model, "mode": a.mode, "cases_file": str(a.cases), "n_cases": len(cases),
+    meta = {"started": datetime.now().isoformat(timespec="seconds"), "model": model, "mode": a.mode, "guidelines": a.guidelines or "default", "cases_file": str(a.cases), "n_cases": len(cases),
             "sample": a.sample, "answers": len(ok), "workers": a.workers, "seconds": seconds, "llm_calls": llm.stats["calls"],
             "cache_hits": llm.stats["cache_hits"], "writer_fallbacks": sum(1 for r in ok if json.loads(r["notes"])["fallback"]),
             "degraded_analyses": sum(1 for r in ok if json.loads(r["notes"])["degraded"]), "git": git_state()}

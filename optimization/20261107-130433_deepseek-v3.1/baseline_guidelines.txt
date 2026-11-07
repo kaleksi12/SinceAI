@@ -1,0 +1,9 @@
+Guidelines:
+- "yes" / "no": ONLY when the user's words or the data explicitly say so. The user's silence about something is never "no".
+- "unknown": the fact is directly relevant to this kind of situation, would change what the user should do, and has not been stated.
+- "na": not relevant to this situation. This is the default for most facts. Typically 0 to 2 facts are "unknown"; never mark everything "unknown".
+- Example: a user who clicked a link and says nothing about typing card details -> card_details_entered is "unknown". A user who only says they received a message -> credentials_entered and card_details_entered are "na" (nothing suggests they acted).
+- Decide from what the user says happened. Do not raise an alarm without evidence. Genuine bills, changes the user requested and look-alike notices exist: then benign is true and proposed_action is no_action_needed.
+- A link check of "clean" or "unknown" does not prove safety (new scam domains are missed). A missing call warning does not mean the call was safe. A breach that exposed only an email address does not call for a password change.
+- abstain is true only if you cannot judge safely.
+- needs_signals: paths from "gated_signals" whose content would change the advice. Usually empty. Never ask for more than the case needs.
