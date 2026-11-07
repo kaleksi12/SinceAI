@@ -23,10 +23,15 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(env["benign_allowed"])
 
     def test_unknown_assumed_yes_in_single_turn(self):
-        env = evaluate({"money_transferred": "unknown"}, assume_unknown_yes=True)
+        env = evaluate({"money_transferred": "unknown"}, assume=["money_transferred"])
         self.assertEqual(env["forced_action"], "contact_bank_and_block_cards")
         self.assertEqual(env["ask_topics"], ["payment_status"])
         self.assertEqual(env["target"], "human_advisor")
+
+    def test_unknown_slots_that_are_not_assumed_trigger_nothing(self):
+        env = evaluate({"money_transferred": "unknown", "code_shared": "unknown"}, assume=["money_transferred"])
+        self.assertEqual(env["reasons"], ["R2"])
+        self.assertEqual(env["also_actions"], [])
 
     def test_business_money_escalates_to_business_support(self):
         env = evaluate({"money_transferred": "yes"}, audience="small_business")
@@ -39,7 +44,7 @@ class RulesTest(unittest.TestCase):
 
     def test_sim_event_from_signals(self):
         sig = {"subscription": {"recent_events": [{"type": "esim_activation"}], "network_status": {"service": "no_service"}}}
-        env = evaluate({"self_initiated": "unknown"}, sig, assume_unknown_yes=True)
+        env = evaluate({"self_initiated": "unknown"}, sig, assume=["self_initiated"])
         self.assertEqual(env["forced_action"], "contact_operator_support")
         self.assertEqual(env["signals_used"], ["subscription.recent_events", "subscription.network_status"])
 

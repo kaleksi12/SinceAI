@@ -21,15 +21,18 @@ What comes from the organisers and what we wrote. Updated with every change.
 | `.gitignore` | Keeps `.env`, `out/` and caches out of git |
 | `.gitattributes` | Leaves `simset/` bytes untouched so its `MANIFEST.json` checksums stay valid |
 | `.env.example` | Template for the API key, base URL and model |
-| `requirements.txt` | Python dependencies: fastapi, uvicorn, openai, python-dotenv |
+| `requirements.txt` | Python dependencies: fastapi, uvicorn, openai (only as an OpenAI-compatible HTTP client), python-dotenv |
 | `assistant/__init__.py` | Empty package for our code |
 | `assistant/llm.py` | OpenAI-compatible client (Featherless) with an on-disk response cache in `.llm_cache/` |
 | `scripts/smoke_llm.py` | Lists models and tests key, JSON output and Finnish quality for one model |
 | `assistant/rules.py` | Safety envelope R1-R12: yes/no/unknown facts -> forced action, risk floor, escalation, questions to ask. Rules derived from patterns in the dev set; vocabularies (actions, topics, escalation targets) are the kit's |
-| `tests/test_rules.py` | 15 unit tests for the rules |
-| `assistant/kit.py` | The one place that imports the organisers' kit (textcheck, baseline templates, vocabularies, guidance corpus) |
+| `tests/test_rules.py` | Unit tests for the rules |
+| `assistant/dialogue.py` | Live-chat engine: one `step(event, state)` function in the kit's multi-turn bot protocol (usable with the kit's `run_conversation.py` and by the API). Asks consent once, asks at most 2 questions, then answers; consent labels and texts in fi/en/sv are ours |
+| `assistant/api.py` | FastAPI app for the web demo: `/api/health`, `/api/scenarios` (free text plus the kit's five sample journeys), `/api/chat`, `/api/escalate` (simulated handoff) |
+| `tests/test_dialogue.py` | Unit tests for the dialogue engine and the API, with the LLM stubbed |
+| `assistant/kit.py` | The one place that imports the organisers' kit (textcheck, baseline templates, vocabularies, guidance corpus, sample journeys, `visible_case` / `reveal_signals` from the simulator) |
 | `assistant/prompts.py` | Analysis and writer prompts. Step lists per action come from dev ground-truth frequencies; action, step, claim and jargon texts come from the kit |
-| `assistant/bot.py` | Single-turn pipeline: LLM analysis -> rules -> LLM wording -> validation (kit `textcheck` unsafe-claim, step, language and jargon checks) -> retry -> kit template fallback |
+| `assistant/bot.py` | Decision pipeline shared by single-turn and live chat: LLM analysis -> rules -> LLM wording -> validation (kit `textcheck` unsafe-claim, step, language and jargon checks) -> retry -> kit template fallback |
 | `scripts/run_single.py` | Runs the bot over a cases file (optionally a seeded sample) into a new `runs/<timestamp>_<label>/` folder: predictions, the kit's evaluate.py report (json and text), the kit's validate.py result, the kit baseline's predictions and report on the same cases, and run_meta.json. Calls the kit scripts unchanged as subprocesses |
 | `PROVENANCE.md` | This file |
 | `README.md` | Created by the team on GitHub (placeholder for now) |

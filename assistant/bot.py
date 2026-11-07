@@ -1,4 +1,13 @@
-"""Single-turn assistant: LLM analysis -> rules envelope -> LLM wording -> validation."""
+"""The assistant's decision pipeline, shared by the single-turn runner and the multi-turn dialogue.
+
+For one situation the pipeline does:
+  1. analyze():        LLM reads the user's words (and visible signals) and fills the rules' "slots".
+  2. rules (rules.py): code turns the slots into limits (forced action, minimum risk, escalation, questions).
+  3. compose_answer(): code clamps the LLM's proposal to those limits, then the LLM writes the user-facing
+                       advice, and check_advice() validates it (retry once, then fall back to a template).
+answer_single_turn() runs the whole thing once for a case (the submission format).
+dialogue.py calls the same pieces turn by turn for the live chat.
+"""
 import copy
 import json
 import os
@@ -6,20 +15,22 @@ import re
 
 from . import kit, llm, prompts, rules
 
-GATED = "available_with_consent"
+GATED = "available_with_consent"  # placeholder for a signal the user has not allowed us to see
 ACTIONS = set(kit.ref("action_vocabulary.json")["actions"])
-YNU = {"yes", "no", "unknown", "na"}
+YNU = {"yes", "no", "unknown", "na"}  # allowed values of a yes/no slot
 BOOL_FACTS = ["self_initiated", "code_shared", "credentials_entered", "card_details_entered", "money_transferred", "app_installed",
               "remote_access_given", "operator_change", "monitoring_suspected", "out_of_scope_request", "requests_sensitive_action"]
 CHOICES = {"code_for": {"operator", "bank", "other"}, "credentials_kind": {"bank_or_id", "other"},
            "lure_type": {"small_payment_or_card", "credentials_or_transfer", "other"}}
-MAX_QUESTIONS = 2
+MAX_QUESTIONS = 2  # at most this many questions per answer / conversation (fewer questions = fewer "unnecessary" ones)
+# The kit has no question wording for this topic, so we supply it.
 EXTRA_QUESTIONS = {"remote_access_given": {"fi": "Annoitko soittajalle etäkäytön laitteeseesi?", "en": "Did you let the caller control your device remotely?",
                                            "sv": "Gav du uppringaren fjärråtkomst till din enhet?"}}
 
 
 def parse_json(text):
-    text = re.sub(r"<think>.*?</think>", "", text, flags=re.S)
+    """Return the first JSON object in an LLM reply (models sometimes add prose, code fences or repeat the object)."""
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.S)  # drop reasoning blocks some models emit
     obj, _ = json.JSONDecoder().raw_decode(text[text.index("{"):])
     if not isinstance(obj, dict):
         raise ValueError("not an object")
@@ -27,6 +38,7 @@ def parse_json(text):
 
 
 def _hide(signals, paths):
+    """Replace each dotted path (e.g. "subscription.network_status") in `signals` with the GATED placeholder."""
     for path in paths:
         parts = path.split(".")
         cur = signals
@@ -37,13 +49,17 @@ def _hide(signals, paths):
 
 
 def build_view(case, revealed):
-    """The case as the LLM may see it: every consent-gated signal is hidden until requested."""
+    """The case as the LLM may see it: every consent-gated signal is hidden until it has been requested and allowed.
+
+    `case` holds the real values (single-turn) or placeholders for not-yet-granted ones (live chat);
+    `revealed` is the set of gated paths the LLM may look at."""
     view = copy.deepcopy(kit.visible(case))
     _hide(view["signals"], [p for p in case["consent"]["requires_consent"] if p not in revealed])
     return view
 
 
 def _normalise(raw):
+    """Clean the LLM's analysis JSON: unknown or invalid values become safe defaults."""
     facts = {}
     for k in BOOL_FACTS:
         v = (raw.get("facts") or {}).get(k, "na")
@@ -53,14 +69,17 @@ def _normalise(raw):
         facts[k] = v if v in allowed else "na"
     risk = raw.get("risk_level")
     return {"summary": str(raw.get("summary", ""))[:300], "facts": facts,
+            "language": raw.get("language") if raw.get("language") in prompts.LANG_NAME else None,
             "proposed_action": raw.get("proposed_action") if raw.get("proposed_action") in ACTIONS else "verify_via_official_channel",
             "risk_level": risk if risk in rules.RISK else "medium", "benign": bool(raw.get("benign")),
             "abstain": bool(raw.get("abstain")), "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)]}
 
 
-def analyze(view, gated_left, model):
-    """Returns (analysis, degraded)."""
-    msgs = prompts.analysis_messages(view, gated_left)
+def analyze(view, gated_left, model, transcript=None):
+    """Ask the LLM to analyse the situation. Returns (analysis, degraded).
+
+    degraded=True means the LLM never produced valid JSON and we fell back to cautious defaults."""
+    msgs = prompts.analysis_messages(view, gated_left, transcript)
     for _ in range(2):
         text = llm.complete(msgs, model=model, max_tokens=800)
         try:
@@ -71,23 +90,27 @@ def analyze(view, gated_left, model):
 
 
 def question_text(topic, lang):
+    """The question for a decisive topic, in the user's language (wording from the kit's baseline)."""
     q = kit.baseline.QUESTIONS.get(topic) or EXTRA_QUESTIONS.get(topic)
     return q.get(lang) or q["en"]
 
 
 def pick_passages(summary, action, lang, k=2):
+    """Choose up to k guidance passages for the writer: the one tied to the action, plus the best keyword match."""
     corpus = {g["id"]: g for g in kit.guidance()}
     ids = [i for i in kit.baseline.CITE.get(action, []) if i in corpus]
     words = {w for w in re.findall(r"[a-z]{4,}", summary.lower())}
     scored = sorted(((len(words & set(re.findall(r"[a-z]{4,}", (g["title_en"] + " " + g["text_en"]).lower()))), g["id"])
                      for g in corpus.values() if g["id"] not in ids), reverse=True)
-    ids = (ids + [i for n, i in scored if n >= 3])[:k]
+    ids = (ids + [i for n, i in scored if n >= 3])[:k]  # require some real overlap, or the passage is just noise
     return ids, [{"title": corpus[i].get("title_" + lang) or corpus[i]["title_en"], "text": corpus[i].get("text_" + lang) or corpus[i]["text_en"]} for i in ids]
 
 
 def check_advice(advice, steps, lang, action, core, monitoring=False):
+    """Validate the writer's text with the kit's checks. Returns a list of problems (empty = acceptable)."""
     tc = kit.textcheck
     full = advice + "\n" + "\n".join(steps)
+    # Claims that are never acceptable, plus context-dependent ones (see prompts.ALWAYS_BAN).
     bans = list(prompts.ALWAYS_BAN) + ([] if action == "no_action_needed" else ["false_reassurance"]) + (["remove_monitoring_immediately"] if monitoring else [])
     problems = ["unsafe statement (%s): '%s'" % (u["claim"], u["match"]) for u in tc.find_unsafe(full, bans, lang)]
     n = len(tc.words(advice))
@@ -96,6 +119,7 @@ def check_advice(advice, steps, lang, action, core, monitoring=False):
     sents = tc.sentences(advice)
     if sents and n / len(sents) > 20:
         problems.append("sentences are too long")
+    # Whole text and each longer sentence must be in the user's language (no mixing).
     det = tc.detect_language(advice)
     if det not in (None, lang) or any(tc.detect_language(s) not in (None, lang) for s in sents if len(tc.words(s)) >= 4):
         problems.append("wrong or mixed language, write only in " + prompts.LANG_NAME[lang])
@@ -108,9 +132,9 @@ def check_advice(advice, steps, lang, action, core, monitoring=False):
 
 
 def write_advice(lang, audience, final, env, analysis, topics, passages, model):
-    """Returns (advice, steps, used_fallback)."""
+    """Have the LLM write the advice for the decided action. Returns (advice, steps, used_fallback)."""
     core, _ = prompts.steps_for(final["primary_action"])
-    extra = []
+    extra = []  # feedback messages added on the retry
     for _ in range(2):
         text = llm.complete(prompts.writer_messages(lang, audience, final, env, analysis, topics, passages, extra), model=model, max_tokens=900)
         try:
@@ -125,12 +149,14 @@ def write_advice(lang, audience, final, env, analysis, topics, passages, model):
             print("  [rejected %s] %s" % (final["primary_action"], "; ".join(problems)))
         extra = [{"role": "assistant", "content": text},
                  {"role": "user", "content": "Rejected: " + "; ".join(problems) + ". Rewrite and return only the JSON object."}]
+    # Both attempts failed: use the kit's ready-made template for this action.
     return kit.baseline.TEMPL[final["primary_action"]].get(lang) or kit.baseline.TEMPL[final["primary_action"]]["en"], [], True
 
 
 def confidence(final, analysis, env, degraded, fallback):
+    """A 0-1 confidence computed from how the run went (not asked from the LLM, whose own numbers are poorly calibrated)."""
     c = 0.85 - 0.35 * degraded - 0.15 * fallback - 0.2 * bool(env["ask"]) - 0.25 * analysis["abstain"]
-    c -= 0.15 * (analysis["proposed_action"] != final["primary_action"])
+    c -= 0.15 * (analysis["proposed_action"] != final["primary_action"])  # the rules overrode the LLM
     return round(max(0.2, c), 2)
 
 
@@ -148,12 +174,38 @@ def signals_used(view, revealed):
     return used + sorted(revealed)
 
 
+def compose_answer(case, analysis, degraded, view, revealed, env, topics, model, mode, consent_requested=()):
+    """Turn an analysis plus the rules' limits into the final answer (the submission format).
+
+    topics: question topics to append to the advice (single-turn asks inside the answer; the live chat
+    asks earlier, so it passes none)."""
+    audience = case["audience"]
+    lang = case.get("language") or analysis["language"] or "en"  # dev/test cases carry the language; live chat detects it
+    final = rules.clamp({"primary_action": analysis["proposed_action"], "risk_level": analysis["risk_level"], "abstained": analysis["abstain"]},
+                        env, audience)
+    cite_ids, passages = pick_passages(analysis["summary"], final["primary_action"], lang)
+    advice, steps, fallback = write_advice(lang, audience, final, env, analysis, topics, passages, model)
+    questions = [question_text(t, lang) for t in topics]
+    if questions:
+        advice += "\n" + "\n".join(questions)
+    return {
+        "case_id": case["case_id"], "mode": mode, "risk_level": final["risk_level"], "primary_action": final["primary_action"],
+        "advice_text": advice, "escalation_required": final["escalation_required"], "escalation_target": final["escalation_target"],
+        "urgency": final["urgency"], "steps": steps, "questions_asked": questions, "question_topics": topics,
+        "signals_used": signals_used(view, revealed), "consent_requested_for": sorted(consent_requested), "citations": cite_ids,
+        "confidence": confidence(final, analysis, env, degraded, fallback), "abstained": analysis["abstain"],
+        # Debug info for failure analysis: which rules fired, what the LLM proposed, and which facts it extracted.
+        "notes": json.dumps({"rules": env["reasons"], "proposed": analysis["proposed_action"], "degraded": degraded, "fallback": fallback,
+                             "lang": lang, "facts": {k: v for k, v in analysis["facts"].items() if v != "na"}}),
+    }
+
+
 def answer_single_turn(case, model=None):
-    """One answer per case, as in the submission format."""
-    lang, audience = case["language"], case["audience"]
+    """One answer for one case, as in the submission format (no conversation: questions are part of the answer)."""
     gated = list(case["consent"]["requires_consent"])
     pre = set(case["consent"]["pre_granted"])
 
+    # Pass 1: the LLM sees no gated signal. If it needs some, reveal only those and analyse again.
     revealed = set()
     analysis, degraded = analyze(build_view(case, revealed), gated, model)
     wanted = [p for p in analysis["needs_signals"] if p in gated][:3]
@@ -162,22 +214,8 @@ def answer_single_turn(case, model=None):
         analysis, degraded = analyze(build_view(case, revealed), [p for p in gated if p not in revealed], model)
     view = build_view(case, revealed)
 
-    env = rules.evaluate(analysis["facts"], view["signals"], audience, assume_unknown_yes=True)
-    final = rules.clamp({"primary_action": analysis["proposed_action"], "risk_level": analysis["risk_level"], "abstained": analysis["abstain"]},
-                        env, audience)
-    topics = env["ask_topics"][:MAX_QUESTIONS]
-    cite_ids, passages = pick_passages(analysis["summary"], final["primary_action"], lang)
-    advice, steps, fallback = write_advice(lang, audience, final, env, analysis, topics, passages, model)
-    questions = [question_text(t, lang) for t in topics]
-    if questions:
-        advice += "\n" + "\n".join(questions)
-
-    return {
-        "case_id": case["case_id"], "mode": "single_turn", "risk_level": final["risk_level"], "primary_action": final["primary_action"],
-        "advice_text": advice, "escalation_required": final["escalation_required"], "escalation_target": final["escalation_target"],
-        "urgency": final["urgency"], "steps": steps, "questions_asked": questions, "question_topics": topics,
-        "signals_used": signals_used(view, revealed), "consent_requested_for": sorted(revealed - pre), "citations": cite_ids,
-        "confidence": confidence(final, analysis, env, degraded, fallback), "abstained": analysis["abstain"],
-        "notes": json.dumps({"rules": env["reasons"], "proposed": analysis["proposed_action"], "degraded": degraded, "fallback": fallback,
-                             "facts": {k: v for k, v in analysis["facts"].items() if v != "na"}}),
-    }
+    # Ask about (and, in the advice, assume the riskier answer for) the top unknown decisive facts.
+    ask = rules.evaluate(analysis["facts"], view["signals"], case["audience"])["ask"][:MAX_QUESTIONS]
+    env = rules.evaluate(analysis["facts"], view["signals"], case["audience"], assume=ask)
+    topics = [rules.SLOT_TOPIC[s] for s in ask]
+    return compose_answer(case, analysis, degraded, view, revealed, env, topics, model, "single_turn", revealed - pre)

@@ -1,4 +1,5 @@
 fastapi
 uvicorn
-openai # Where do we need this? Openai models are not used (at least at the moment)
+# Only an OpenAI-compatible HTTP client (retries, timeouts) for Featherless open-weights models; no OpenAI service or model is used.
+openai
 python-dotenv
