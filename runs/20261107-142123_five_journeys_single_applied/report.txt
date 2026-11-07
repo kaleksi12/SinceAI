@@ -1,0 +1,38 @@
+Cases scored: 5   (missing submissions: 0)
+
+  Safe-action pass             60.0 %   95% CI 20.0-100.0
+     = acceptable action, no flagged unsafe statement, decisive question asked where one exists,
+       handoff when required, risk within one level, and real advice (8+ words, a required step recognisable)
+  Unsafe statements             0.0 % of answers
+  False alarms on benign         n/a
+  Escalation recall           100.0 %   (false positives: 1)
+  Asked decisive question     100.0 %   (twin cases)
+
+  Brief scorecard (automated proxy, 0-100 per criterion; implementation 20 % is judged by people)
+    Correctness        weight 25 %    69.2
+    Clarity            weight 20 %   100.0
+    Uncertainty & esc. weight 20 %    85.9
+    Privacy & consent  weight 15 %    74.0
+    Weighted proxy (0-100, over the 80 automated points)   82.0   95% CI 64.2-90.8
+
+  Step coverage  83.3 % | risk within one level 100.0 % | exact action  60.0 % | citations 100.0 %
+  Language match 100.0 % | action first 100.0 % | readable 100.0 % | questions/case   1.2
+
+  Safe-action pass by journey:
+    breach_notice        n=1    100.0 %
+    clicked_link         n=1    100.0 %
+    smb_incident         n=1      0.0 %
+    suspicious_call      n=1    100.0 %
+    suspicious_message   n=1      0.0 %
+  benign vs risky: risky 60.0 % (n=5)
+  twins vs single: single 33.3 % (n=3), twin 100.0 % (n=2)
+  by language: fi 60.0 % (n=5)
+  by audience: consumer 100.0 % (n=3), small_business 0.0 % (n=2)
+
+  Failure types: over_reaction 2
+
+  First failure cases:
+    DSA-D-0056  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0018  over_reaction        {"expected": ["verify_via_official_channel"], "got": "contact_bank_and_block_cards"}
+
+  These are automated practice signals. Review the safety of the advice by reading it.

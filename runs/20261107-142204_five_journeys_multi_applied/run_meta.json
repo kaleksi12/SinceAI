@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-07T14:22:59",
+  "model": "deepseek-ai/DeepSeek-V3.1",
+  "mode": "multi",
+  "guidelines": "default",
+  "cases_file": "simset\\data\\samples\\five_journeys.jsonl",
+  "n_cases": 5,
+  "sample": 0,
+  "answers": 5,
+  "workers": 4,
+  "seconds": 55,
+  "llm_calls": 12,
+  "cache_hits": 7,
+  "writer_fallbacks": 0,
+  "degraded_analyses": 0,
+  "git": "66a4137+uncommitted changes"
+}

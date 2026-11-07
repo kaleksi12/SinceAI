@@ -72,15 +72,18 @@ Plus three choice facts:
 """
 
 # The part that prompt optimization rewrites. Anything that is not about *how to judge* must stay out of here.
+# Current text: candidate 0ca44fbc from optimization/20261107-130433_deepseek-v3.1 (ProTeGi-style run, reviewed by hand).
+# The hand-written text it replaced is kept in that folder as baseline_guidelines.txt.
 GUIDELINES = """Guidelines:
-- "yes" / "no": ONLY when the user's words or the data explicitly say so. The user's silence about something is never "no".
-- "unknown": the fact is directly relevant to this kind of situation, would change what the user should do, and has not been stated.
-- "na": not relevant to this situation. This is the default for most facts. Typically 0 to 2 facts are "unknown"; never mark everything "unknown".
-- Example: a user who clicked a link and says nothing about typing card details -> card_details_entered is "unknown". A user who only says they received a message -> credentials_entered and card_details_entered are "na" (nothing suggests they acted).
-- Decide from what the user says happened. Do not raise an alarm without evidence. Genuine bills, changes the user requested and look-alike notices exist: then benign is true and proposed_action is no_action_needed.
-- A link check of "clean" or "unknown" does not prove safety (new scam domains are missed). A missing call warning does not mean the call was safe. A breach that exposed only an email address does not call for a password change.
-- abstain is true only if you cannot judge safely.
-- needs_signals: paths from "gated_signals" whose content would change the advice. Usually empty. Never ask for more than the case needs."""
+- Use "yes" only when the user explicitly states a fact or the context strongly implies it; lack of a statement is not "no". Use "no" only if the user explicitly denies the fact.
+- Use "unknown" only for facts that are both (a) critical to the decision and (b) not yet known, and where the answer could change the required protective action. Do not mark a fact as "unknown" if other known facts already justify a protective action, or if the answer would not alter the immediate critical step.
+- Use "na" when the fact is irrelevant to the scenario. This is the default for most facts.
+- Set "benign" to true if there is clear, contextual evidence that the activity was authorized or non-impactful (e.g., user-initiated actions, legitimate business processes with consistent details). Then propose "no_action_needed".
+- In business or high-risk contexts (e.g., potential ransomware, account compromise, fraud propagation), prioritize protective actions (e.g., secure accounts, isolate systems) over verification if the threat is plausible and irreversible harm is possible. Do not delay protection to ask about secondary details.
+- When known facts provide clear grounds for a protective action (e.g., credentials entered on a lure site, remote access granted to an unknown party), proceed directly to that action without marking related facts as "unknown".
+- List in "needs_signals" only signals that could directly change the recommended action. Omit signals that would not alter the priority protective step.
+- Use "abstain" only if the scenario is too ambiguous to assess risk safely.
+- Avoid unnecessary questions: if a decisive fact is already known or the protective action is mandated by other evidence, do not seek confirmation. Focus questions on user-known facts that would de-escalate an otherwise high-risk situation."""
 
 ANALYSIS_TAIL = """
 
