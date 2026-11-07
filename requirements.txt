@@ -1,4 +1,4 @@
 fastapi
 uvicorn
-openai
+openai # Where do we need this? Openai models are not used (at least at the moment)
 python-dotenv
