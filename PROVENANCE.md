@@ -46,6 +46,7 @@ Generated with Lovable (TanStack Start, React, Tailwind, shadcn/Radix UI) and ad
 | `frontend/src/lib/chatService.ts` | Was a keyword-matching mock; now the typed client for `/api/chat`, `/api/scenarios` and `/api/escalate` |
 | `frontend/src/routes/index.tsx` | Chat page rewritten: scenario picker, consent card, answer card, escalation, new-conversation button, errors. The mock conversation and the unsupported attachment upload are gone |
 | `frontend/src/components/chat/AnswerCard.tsx`, `ConsentCard.tsx` | New: risk/steps/sources/escalation card and the Allow / Not now consent card |
+| `frontend/src/components/chat/DebugPanel.tsx` | New: debug view that shows the raw JSON of every backend request and response (including the backend's `debug` object) instead of the chat bubbles; toggled with the bug icon in the header |
 | `frontend/vite.config.ts` | Added a dev proxy from `/api` to the backend on port 8000 |
 | `.gitignore` | Ignores `node_modules`, build output and `frontend/package-lock.json` (the project uses `bun.lock`) |
 

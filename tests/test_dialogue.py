@@ -90,6 +90,16 @@ class ApiTest(unittest.TestCase):
     def test_unknown_session_is_404(self):
         self.assertEqual(self.client.post("/api/chat", json={"session_id": "nope", "message": "hi"}).status_code, 404)
 
+    def test_debug_info_is_returned_only_when_requested(self):
+        def fake_step(ev, st):
+            st.update(lang="en", debug={"analysis": {"facts": {}}})
+            return {"type": "question", "text": "Did you?", "topics": ["code_shared"]}
+        with mock.patch.object(api.dialogue, "step", fake_step):
+            plain = self.client.post("/api/chat", json={"message": "hi"}).json()
+            debug = self.client.post("/api/chat", json={"message": "hi", "debug": True}).json()
+        self.assertNotIn("debug", plain)
+        self.assertEqual(debug["debug"], {"analysis": {"facts": {}}})
+
     def test_chat_returns_an_answer_card_with_disclaimer(self):
         final = {"type": "final", "answer": {"advice_text": "Do this.", "risk_level": "high", "urgency": "today", "primary_action": "contact_bank_and_block_cards",
                                              "steps": ["a"], "escalation_required": True, "escalation_target": "human_advisor",

@@ -67,19 +67,72 @@ export interface EscalationResult {
 /** An error with a message that is safe to show to the user. */
 export class ChatError extends Error {}
 
+/** One request/response pair with the backend, kept for the debug view. */
+export interface Exchange {
+  id: number;
+  time: string;
+  method: string;
+  url: string;
+  request: unknown;
+  /** HTTP status; 0 means the backend could not be reached. */
+  status: number;
+  response: unknown;
+  ms: number;
+}
+
+const exchangeListeners = new Set<(e: Exchange) => void>();
+let nextExchangeId = 1;
+
+/** Subscribe to every backend exchange (returns the unsubscribe function). */
+export function onExchange(listener: (e: Exchange) => void): () => void {
+  exchangeListeners.add(listener);
+  return () => exchangeListeners.delete(listener);
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const started = performance.now();
+  const record = (status: number, response: unknown) => {
+    let sent: unknown = null;
+    try {
+      sent = typeof init?.body === "string" ? JSON.parse(init.body) : null;
+    } catch {
+      sent = init?.body ?? null;
+    }
+    const exchange: Exchange = {
+      id: nextExchangeId++,
+      time: new Date().toLocaleTimeString(),
+      method: init?.method ?? "GET",
+      url,
+      request: sent,
+      status,
+      response,
+      ms: Math.round(performance.now() - started),
+    };
+    exchangeListeners.forEach((listener) => listener(exchange));
+  };
+
   let res: Response;
   try {
     res = await fetch(url, { headers: { "Content-Type": "application/json" }, ...init });
   } catch {
+    record(0, { error: "Cannot reach the backend" });
     throw new ChatError("Cannot reach the assistant. Is the backend running?");
   }
+  // Read the body once as text so it can be both shown in the debug view and parsed.
+  const raw = await res.text();
+  let body: unknown = raw;
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    /* keep the raw text */
+  }
+  record(res.status, body);
   if (!res.ok) {
     // FastAPI sends {"detail": "..."} for errors we raise on purpose.
-    const body = (await res.json().catch(() => null)) as { detail?: unknown } | null;
-    throw new ChatError(typeof body?.detail === "string" ? body.detail : `Request failed (${res.status}).`);
+    const detail = (body as { detail?: unknown } | null)?.detail;
+    throw new ChatError(typeof detail === "string" ? detail : `Request failed (${res.status}).`);
   }
-  return (await res.json()) as T;
+  return body as T;
 }
 
 /* The backend uses snake_case; these types mirror its JSON and are converted to the camelCase types above. */
@@ -156,6 +209,7 @@ export async function sendMessage(args: {
       message: args.message,
       scenario_id: args.scenarioId,
       audience: args.audience,
+      debug: true, // the backend then also returns its internals, which the debug view shows
     }),
   });
   return toBotResponse(raw);
@@ -165,7 +219,7 @@ export async function sendMessage(args: {
 export async function sendConsent(sessionId: string, granted: string[], refused: string[]): Promise<BotResponse> {
   const raw = await request<RawResponse>("/api/chat", {
     method: "POST",
-    body: JSON.stringify({ session_id: sessionId, consent: { granted, refused } }),
+    body: JSON.stringify({ session_id: sessionId, consent: { granted, refused }, debug: true }),
   });
   return toBotResponse(raw);
 }

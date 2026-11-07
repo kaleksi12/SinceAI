@@ -119,6 +119,7 @@ def _advance(state, force_final):
         state["consent_requested"] |= set(wanted)
         text = CONSENT_TEXT[lang] % "; ".join(field_label(p, lang) for p in wanted)
         state["transcript"].append({"role": "assistant", "text": text})
+        state["debug"] = _debug(state, analysis, degraded)
         return {"type": "consent_request", "fields": wanted, "text": text}
 
     lang = case.get("language") or analysis["language"] or state["lang"] or "en"
@@ -126,13 +127,15 @@ def _advance(state, force_final):
     audience = case["audience"]
 
     # Decisive facts still unknown (ordered by priority); ask about the first one we have not asked yet.
-    unknown = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])["ask"]
+    env0 = rules.evaluate(analysis["facts"], view["signals"], audience, benign=analysis["benign"])
+    unknown = env0["ask"]
     pending = [s for s in unknown if rules.SLOT_TOPIC[s] not in state["asked"]]
     if pending and not force_final and len(state["asked"]) < bot.MAX_QUESTIONS:
         topic = rules.SLOT_TOPIC[pending[0]]
         state["asked"].append(topic)
         text = bot.question_text(topic, lang)
         state["transcript"].append({"role": "assistant", "text": text})
+        state["debug"] = _debug(state, analysis, degraded, env0)
         return {"type": "question", "text": text, "topics": [topic]}
 
     # Final answer. A fact we already asked about but is still unclear is treated as the riskier branch.
@@ -142,7 +145,20 @@ def _advance(state, force_final):
                                 state["model"], "multi_turn", state["consent_requested"])
     state["transcript"].append({"role": "assistant", "text": answer["advice_text"]})
     state["last"] = {"analysis": analysis, "answer": answer}
+    state["debug"] = _debug(state, analysis, degraded, env)
     return {"type": "final", "answer": answer}
+
+
+def _debug(state, analysis, degraded, env=None):
+    """Internals of the latest turn: what the LLM extracted, which rules fired, consent and question state.
+
+    Not part of the protocol; the API returns it only when the client asks for it (frontend debug view)."""
+    out = {"language": state["lang"], "analysis": analysis, "analysis_degraded": degraded, "questions_asked_so_far": list(state["asked"]),
+           "signals_released": sorted(state["revealed"]), "signals_refused": sorted(state["refused"]),
+           "consent_requested": sorted(state["consent_requested"])}
+    if env:
+        out["rules"] = {k: env[k] for k in ("reasons", "forced_action", "also_actions", "risk_floor", "escalate", "target", "ask", "lure_floor", "benign_allowed")}
+    return out
 
 
 def handoff_summary(state):

@@ -64,6 +64,7 @@ class ChatRequest(BaseModel):
     consent: ConsentReply | None = None  # the user's answer to a consent_request
     scenario_id: str | None = None  # first message only: start from a sample journey
     audience: Literal["consumer", "small_business"] = "consumer"  # first message only, free text
+    debug: bool = False  # also return the engine's internals for this turn (frontend debug view)
 
 
 class EscalateRequest(BaseModel):
@@ -176,7 +177,10 @@ def chat(req: ChatRequest):
         except Exception as e:  # LLM/API trouble: do not leak details to the browser
             print("chat error:", type(e).__name__, str(e)[:200])
             raise HTTPException(502, "The assistant is temporarily unavailable. Please try again.")
-        return _to_response(sid, s["state"], reply)
+        res = _to_response(sid, s["state"], reply)
+        if req.debug:
+            res["debug"] = s["state"].get("debug")
+        return res
 
 
 @app.post("/api/escalate")

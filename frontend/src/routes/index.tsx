@@ -1,17 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, House, LayoutGrid, FileText, Ticket, Ellipsis, SendHorizontal, Paperclip, LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowLeft, Bug, House, LayoutGrid, FileText, Ticket, Ellipsis, SendHorizontal, Paperclip, LoaderCircle, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AnswerCard } from "@/components/chat/AnswerCard";
 import { ConsentCard } from "@/components/chat/ConsentCard";
+import { DebugPanel } from "@/components/chat/DebugPanel";
 import {
   ChatError,
   escalate,
   getScenarios,
+  onExchange,
   sendConsent,
   sendMessage,
   type AnswerCard as AnswerData,
   type BotResponse,
   type ConsentField,
+  type Exchange,
   type Scenario,
 } from "@/lib/chatService";
 
@@ -67,6 +70,9 @@ function Index() {
   const [escalated, setEscalated] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [scenarioId, setScenarioId] = useState("free_consumer");
+  // Debug view: show the raw JSON exchanged with the backend instead of the chat bubbles.
+  const [debug, setDebug] = useState(false);
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const nextId = useRef(1);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -75,14 +81,20 @@ function Index() {
     getScenarios().then(setScenarios).catch(() => undefined);
   }, []);
 
+  // Collect every backend exchange (also while the debug view is off, so switching it on shows the whole history).
+  useEffect(() => onExchange((e) => setExchanges((prev) => (e.url === "/api/scenarios" ? prev : [...prev, e]))), []);
+
   // Keep the newest message in view.
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, waiting]);
+  }, [messages, exchanges, debug, waiting]);
 
   const scenario = scenarios.find((s) => s.id === scenarioId);
   // While a consent question is open the user must answer it with the buttons.
   const consentOpen = messages.some((m) => m.consent && !m.consent.choice);
+  // The debug view has no bubbles, so the buttons that need a click are shown separately.
+  const pendingConsent = messages.find((m) => m.consent && !m.consent.choice);
+  const escalationOffered = messages.some((m) => m.answer?.escalationRequired);
 
   const push = (msg: Omit<ChatMessage, "id">) => setMessages((prev) => [...prev, { ...msg, id: nextId.current++ }]);
 
@@ -157,6 +169,7 @@ function Index() {
 
   const reset = () => {
     setMessages([greeting]);
+    setExchanges([]);
     setSessionId(undefined);
     setEscalated(false);
     setError(null);
@@ -170,6 +183,15 @@ function Index() {
           <ArrowLeft className="h-6 w-6" />
         </button>
         <h1 className="font-display flex-1 text-xl font-bold">Security Assistant</h1>
+        <button
+          aria-label="Debug view"
+          aria-pressed={debug}
+          title={debug ? "Back to the chat view" : "Show the JSON objects instead of the messages"}
+          onClick={() => setDebug((d) => !d)}
+          className={`rounded p-1 ${debug ? "bg-primary-foreground text-primary" : ""}`}
+        >
+          <Bug className="h-5 w-5" />
+        </button>
         <button aria-label="New conversation" title="New conversation" onClick={reset} className="p-1">
           <RotateCcw className="h-5 w-5" />
         </button>
@@ -197,7 +219,32 @@ function Index() {
         )}
 
         <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {messages.map((msg) => (
+          {debug && (
+            <div className="space-y-3">
+              <DebugPanel exchanges={exchanges} />
+              {pendingConsent?.consent && (
+                <div className="rounded-lg border border-border bg-background p-2 text-xs">
+                  <p className="whitespace-pre-line text-foreground">{pendingConsent.text}</p>
+                  <ConsentCard
+                    fields={pendingConsent.consent.fields}
+                    choice={pendingConsent.consent.choice}
+                    disabled={waiting}
+                    onAnswer={(granted) => onConsent(pendingConsent.id, pendingConsent.consent!.fields, granted)}
+                  />
+                </div>
+              )}
+              {escalationOffered && !escalated && (
+                <button
+                  type="button"
+                  onClick={onEscalate}
+                  className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+                >
+                  Hand over to a human
+                </button>
+              )}
+            </div>
+          )}
+          {!debug && messages.map((msg) => (
             <div
               key={msg.id}
               className={
