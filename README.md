@@ -15,7 +15,9 @@ The same pipeline serves the single-turn submission and the live chat (`assistan
 
 ## Setup
 
-Requirements: Python 3 (developed on 3.12) and [Bun](https://bun.sh) (or npm) for the frontend.
+**Requirements:** Python 3 (developed on 3.12) and [Bun](https://bun.sh) (or npm) for the frontend.
+
+Next, install the required Python libraries and create your ```.env``` file, to which you'll add your Featherless API key: 
 
 ```bash
 pip install -r requirements.txt
@@ -25,7 +27,7 @@ cp .env.example .env          # then set FEATHERLESS_API_KEY (and optionally LLM
 ## Run the app
 
 ```bash
-uvicorn assistant.api:app --reload --port 8000     # backend
+python3 -m uvicorn assistant.api:app --reload --port 8000     # backend
 cd frontend && bun install && bun run dev          # frontend (npm install / npm run dev also works)
 ```
 
