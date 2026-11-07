@@ -16,6 +16,12 @@ class RulesTest(unittest.TestCase):
     def test_operator_code_goes_to_operator(self):
         env = evaluate({"code_shared": "yes", "code_for": "operator"})
         self.assertEqual(env["forced_action"], "contact_operator_support")
+        self.assertTrue(env["escalate"])
+        self.assertEqual(env["target"], "operator_support_agent")
+
+    def test_bank_code_has_no_handoff_for_consumers(self):
+        env = evaluate({"code_shared": "yes", "code_for": "bank"})
+        self.assertFalse(env["escalate"])
 
     def test_unknown_asks_and_is_not_forced_in_multi_turn(self):
         env = evaluate({"card_details_entered": "unknown"})

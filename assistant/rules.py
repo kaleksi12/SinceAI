@@ -107,10 +107,12 @@ def evaluate(facts, signals=None, audience="consumer", assume=(), benign=False):
     # R5: SIM/eSIM change or lost service the user did not start: likely takeover, operator must lock the number.
     if eff["operator_change"] == "yes" and eff["self_initiated"] != "yes":
         add("R5", "contact_operator_support", "critical", True, "business_security_support" if smb else "operator_support_agent")
-    # R1: a code or PIN was shared: critical. Operator codes go to the operator, others to the bank.
+    # R1: a code or PIN was shared: critical. Operator codes go to the operator (with a handoff: the number must be locked),
+    # others to the bank.
     if eff["code_shared"] == "yes":
-        action = "contact_operator_support" if eff["code_for"] == "operator" else "contact_bank_and_block_cards"
-        add("R1", action, "critical", smb, "business_security_support" if smb else None)
+        operator = eff["code_for"] == "operator"
+        add("R1", "contact_operator_support" if operator else "contact_bank_and_block_cards", "critical", smb or operator,
+            "business_security_support" if smb else ("operator_support_agent" if operator else None))
     # R2: money already sent (escalate) or card details entered (bank + block cards).
     if eff["money_transferred"] == "yes":
         add("R2", "contact_bank_and_block_cards", "critical", True, "business_security_support" if smb else "human_advisor")

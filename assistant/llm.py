@@ -30,7 +30,8 @@ def _get_client():
         if not key:
             raise RuntimeError("FEATHERLESS_API_KEY is not set (copy .env.example to .env)")
         _client = OpenAI(api_key=key, base_url=os.environ.get("FEATHERLESS_BASE_URL", "https://api.featherless.ai/v1"),
-                         max_retries=4, timeout=120)  # retries cover rate limits (Featherless limits concurrency)
+                         max_retries=4, timeout=120,  # retries cover rate limits (Featherless limits concurrency)
+                         default_headers={"Accept-Encoding": "identity"})  # some httpx2/brotli installs cannot decode compressed replies
     return _client
 
 

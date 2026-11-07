@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-07T19:12:14",
+  "model": "deepseek-ai/DeepSeek-V3.1",
+  "mode": "single",
+  "guidelines": "default",
+  "cases_file": "/tmp/dsa_dev30_b.jsonl",
+  "n_cases": 30,
+  "sample": 0,
+  "answers": 30,
+  "workers": 10,
+  "seconds": 102,
+  "llm_calls": 70,
+  "cache_hits": 3,
+  "writer_fallbacks": 1,
+  "degraded_analyses": 0,
+  "git": "8a89d29+uncommitted changes"
+}

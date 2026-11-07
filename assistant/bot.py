@@ -71,12 +71,15 @@ def _normalise(raw):
     for k, allowed in CHOICES.items():
         v = (raw.get("facts") or {}).get(k, "na")
         facts[k] = v if v in allowed else "na"
-    risk = raw.get("risk_level")
+    risk = raw.get("risk_level") if raw.get("risk_level") in rules.RISK else "medium"
+    benign = bool(raw.get("benign"))
+    # A low-risk benign judgement is a decision, not an inability to judge: abstaining would hand a genuine bank call to a human.
+    abstain = bool(raw.get("abstain")) and not (benign and risk in ("none", "low"))
     return {"summary": str(raw.get("summary", ""))[:300], "facts": facts,
             "language": raw.get("language") if raw.get("language") in prompts.LANG_NAME else None,
             "proposed_action": raw.get("proposed_action") if raw.get("proposed_action") in ACTIONS else "verify_via_official_channel",
-            "risk_level": risk if risk in rules.RISK else "medium", "benign": bool(raw.get("benign")),
-            "abstain": bool(raw.get("abstain")), "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)],
+            "risk_level": risk, "benign": benign,
+            "abstain": abstain, "needs_signals": [p for p in raw.get("needs_signals") or [] if isinstance(p, str)],
             "key_steps": [s for s in raw.get("key_steps") or [] if isinstance(s, str)][:3],
             "clarify": str(raw.get("clarify") or "").strip()[:300]}
 
@@ -170,8 +173,13 @@ def write_advice(lang, audience, final, env, analysis, topics, passages, model, 
         if os.environ.get("DSA_DEBUG"):
             print("  [rejected %s] %s" % (final["primary_action"], "; ".join(problems)))
         extra = [{"role": "assistant", "content": text},
-                 {"role": "user", "content": "Rejected: " + "; ".join(problems) + ". Rewrite and return only the JSON object."}]
-    # Both attempts failed: use the kit's ready-made template for this action.
+                 {"role": "user", "content": "Rejected: " + "; ".join(problems) + ". If a phrase was flagged, do not use that wording at all, "
+                                             "not even negated: describe the safe action in other words. Rewrite and return only the JSON object."}]
+    # Both attempts failed: use a ready-made template for this action (the kit's are written for messages, so calls have their own).
+    art = (signals or {}).get("artifact")
+    if isinstance(art, dict) and art.get("type") == "call" and final["primary_action"] in prompts.CALL_FALLBACK:
+        templ = prompts.CALL_FALLBACK[final["primary_action"]]
+        return templ.get(lang) or templ["en"], [], True
     return kit.baseline.TEMPL[final["primary_action"]].get(lang) or kit.baseline.TEMPL[final["primary_action"]]["en"], [], True
 
 
@@ -260,7 +268,11 @@ def single_turn_envelope(analysis, signals, audience, lang):
     known = rules.evaluate(facts, signals, audience, benign=analysis["benign"])
     ask = pick_questions(known["ask"], lang)
     env = rules.evaluate(facts, signals, audience, assume=ask, benign=analysis["benign"])
-    if env["forced_action"] and not known["forced_action"]:
+    # Exception: a caller who asked for a code. The kit's single-turn rule is "give the step that is safe if the riskier
+    # answer is true", and a call has no 'delete it' option, so the assumed code_shared branch keeps its action.
+    art = (signals or {}).get("artifact")
+    asked_code_on_call = isinstance(art, dict) and art.get("type") == "call" and "code_shared" in ask and env["reasons"][:1] == ["R1"]
+    if env["forced_action"] and not known["forced_action"] and not asked_code_on_call:
         env = dict(env, forced_action=None, risk_floor="none",
                    also_actions=list(dict.fromkeys([env["forced_action"]] + env["also_actions"])))
     return ask, env
