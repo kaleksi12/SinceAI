@@ -18,7 +18,7 @@
 
 ## 3. Five journeys
 
-| Journey | Dev cases | Safe-action pass | False alarms (benign) | Escalation recall | Our own human review: safe / total |
+| Journey | Dev cases | Safe-action pass | False alarms (benign) | Escalation recall | |
 |---|---|---|---|---|---|
 | Suspicious message | 156 | 94.2% |0/48 (0%) |n/a (none required) | |
 | Clicked link | 84 | 90.5% |4/12 (33%) |24/24 (100%) | |
@@ -27,7 +27,7 @@
 | Small-business incident | 156 | 74.4% |7/36 (19.4%) | 51/60 (85%)| |
 | **All** | 588 | 86.6% | 10.6% | 93.2% | |
 
-**Evaluator command and version:** `python3 simset/eval/evaluate.py --cases simset/data/dev/cases.jsonl --submission ...`
+**Evaluator command and version:** `python3 simset/eval/evaluate.py --cases simset/data/dev/cases.jsonl --submission runs/20261108-001633_final_dev_588_single/predictions.jsonl`
 
 **Single-turn or multi-turn:** Single turn
 
@@ -51,7 +51,6 @@ Three answers from the live chat were read aloud to someone outside the team. Af
 | Fake bank SMS asking for a €50 fee (EN) | "I must under no circumstances pay the money, the message must be deleted, and my account must be checked. Also, no links should be clicked." | Yes |
 | Clicked a "Vero" SMS link, bank credentials stolen (FI) | "I need to contact my bank immediately and close my bank account and other things related to my banking credentials." | Partly. Said "close account", advice said block card |
 | Suspected invoice fraud, already paid (EN) | "I need to immediately block my card and inform my bank about it." | Yes, but blocking the card doesn't fit a bank transfer |
-s
 
 ## 7. Privacy and consent
 
@@ -62,6 +61,8 @@ We use all the signals defined in pre-existing signal dictionary, and the assist
 ## 8. Packaging hypothesis for DNA (a hypothesis, not a result)
 
 Ordinary consumers and small business owners can access the assistant through either a web portal or the My DNA mobile app, for example as part of the DNA Digiturva service, or included in corporate data plans. An assistant with sufficiently reliable advice and wide coverage would help save customer service resources.
+
+**Running cost (measured during the hackathon):** with DeepSeek-V3.1 on Featherless, one answer takes about two LLM calls and costs roughly $0.0015; a typical chat conversation of a few turns costs about $0.002–0.005, so 1,000 conversations cost a few dollars. Model cost is therefore pretty small compared with a customer-service contact; the real costs would be hosting, monitoring and the human agents who take the handed cases.
 
 ## 9. Files
 - Predictions for test cases: `test_predictions.jsonl`
