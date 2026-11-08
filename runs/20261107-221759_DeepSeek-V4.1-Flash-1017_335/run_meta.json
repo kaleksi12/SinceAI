@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-07T22:17:59",
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "mode": "single",
+  "guidelines": "default",
+  "cases_file": ".\\test_predictions.jsonl",
+  "n_cases": 335,
+  "sample": 335,
+  "answers": 0,
+  "workers": 4,
+  "seconds": 0,
+  "llm_calls": 0,
+  "cache_hits": 0,
+  "writer_fallbacks": 0,
+  "degraded_analyses": 0,
+  "git": "ab3a381"
+}
