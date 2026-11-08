@@ -48,8 +48,9 @@ Runs: `runs/20261108-001633_final_dev_588_single` and `runs/20261108-060102_fina
 
 ## 4. False alarms
 
-**DSA-D-0034:** I’m logging in on my new laptop and got one approval prompt, should I approve?” The assistant said don’t approve, which contradicts what the user is doing.
-**DSA-D-0082** a genuine admin order confirmation was treated as critical and handed to a human.
+**DSA-D-0034:** "I'm logging in on my new laptop and got one approval prompt, should I approve?" The assistant said don't approve, which contradicts what the user is doing.
+
+**DSA-D-0082:** A genuine admin order confirmation was treated as critical and handed to a human.
 
 ## 5. At least one failure or escalation example
 
