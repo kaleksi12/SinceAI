@@ -18,14 +18,14 @@
 
 ## 3. Five journeys
 
-| Journey | Dev cases | Safe-action pass | False alarms (benign) | Escalation recall | |
-|---|---|---|---|---|---|
-| Suspicious message | 156 | 94.2% |0/48 (0%) |n/a (none required) | |
-| Clicked link | 84 | 90.5% |4/12 (33%) |24/24 (100%) | |
-| Suspicious call | 72 | 	94.4% | 0/12 (0%)|24/24 (100%) | |
-| Breach notice | 120 | 85.0% |3/24 (12.5%) | 24/24 (100%)| |
-| Small-business incident | 156 | 74.4% |7/36 (19.4%) | 51/60 (85%)| |
-| **All** | 588 | 86.6% | 10.6% | 93.2% | |
+| Journey | Dev cases | Safe-action pass | False alarms (benign) | Escalation recall
+|---|---|---|---|---|
+| Suspicious message | 156 | 94.2% |0/48 (0%) |n/a (none required) 
+| Clicked link | 84 | 90.5% |4/12 (33%) |24/24 (100%) 
+| Suspicious call | 72 | 	94.4% | 0/12 (0%)|24/24 (100%) 
+| Breach notice | 120 | 85.0% |3/24 (12.5%) | 24/24 (100%)
+| Small-business incident | 156 | 74.4% |7/36 (19.4%) | 51/60 (85%)
+| **All** | 588 | 86.6% | 10.6% | 93.2% 
 
 **Evaluator command and version:** `python3 simset/eval/evaluate.py --cases simset/data/dev/cases.jsonl --submission runs/20261108-001633_final_dev_588_single/predictions.jsonl`
 
@@ -54,9 +54,11 @@ Three answers from the live chat were read aloud to someone outside the team. Af
 
 ## 7. Privacy and consent
 
-We use all the signals defined in pre-existing signal dictionary, and the assistant asks for consent deemed necessary by the language model. If the user clicks "Deny", the information is not used.
+Signals that need consent (subscription events, installed apps, security-app findings, logins, breach check) are hidden by code until the user agrees; the model can only request them. Signals the user already allowed in settings are used without asking; otherwise the chat asks once per conversation (Allow / Not now), and "Not now" is respected. Each answer records which signals were used and which consent was asked. Privacy proxy score: 87.6.
 
-**NOTE:** The UI design does not sufficiently account for the privacy risks caused by dark patterns.
+Limitation: the free-text chat has no pre-collected signals, so the consent step only appears in the sample journeys.
+
+**Note:** The UI design does not account for the privacy risks caused by dark patterns: "Allow" is a filled pink button while "Not now" is plain white with an outline.
 
 ## 8. Packaging hypothesis for DNA (a hypothesis, not a result)
 
@@ -65,7 +67,7 @@ Ordinary consumers and small business owners can access the assistant through ei
 **Running cost (measured during the hackathon):** with DeepSeek-V3.1 on Featherless, one answer takes about two LLM calls and costs roughly $0.0015; a typical chat conversation of a few turns costs about $0.002–0.005, so 1,000 conversations cost a few dollars. Model cost is therefore pretty small compared with a customer-service contact; the real costs would be hosting, monitoring and the human agents who take the handed cases.
 
 ## 9. Files
-- Predictions for test cases: `test_predictions.jsonl`
-- Evaluation of predictions for 588 dev cases: `runs/20261108-001633_final_dev_588_single`
-- Setup instructions: `README.md`
-- Report `RESULTS.md`
+- `test_predictions.jsonl`: single-turn answers for all 335 test inputs, validated with `simset/tools/validate.py --submission` (from run `runs/20261108-000431_test_335_single_v3`)
+- `runs/20261108-001633_final_dev_588_single/report.txt`: evaluator report for all 588 dev cases (predictions in the same folder)
+- `README.md`: setup instructions, architecture, safety boundaries and how to reproduce the results
+- `RESULTS_REPORT.md`: this report
