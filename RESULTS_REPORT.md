@@ -54,7 +54,7 @@ Runs: `runs/20261108-001633_final_dev_588_single` and `runs/20261108-060102_fina
 
 ## 5. At least one failure or escalation example
 
-**DSA-D-0020:**  A small business case where the user asked "Asking on behalf of our company. What should I do with this?", regarding a phishing link. Instead of telling the user to change their password and escalate to a human, the assistant told the user to simply delete the message. This would allow breached credentials to be abused by attackers, while giving the user a false sense of security. The failure could be addressed through keyword-based rules as well as refinement of the system prompt.
+**DSA-D-0020:** A small business forwarded a fake "shared invoice, sign in with your work email" message. The assistant said to delete it, but never asked whether anyone had already signed in through the link. The reference answer is to change the password and check sign-ins. Fix: for business phishing, ask "Has anyone signed in through this link?" and include the password change as a precaution.
 
 ## 6. Comprehension check
 
