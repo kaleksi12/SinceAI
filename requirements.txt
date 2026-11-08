@@ -3,3 +3,4 @@ uvicorn
 # Only an OpenAI-compatible HTTP client (retries, timeouts) for Featherless open-weights models; no OpenAI service or model is used.
 openai
 python-dotenv
+pytest
