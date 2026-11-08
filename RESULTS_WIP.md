@@ -4,17 +4,17 @@
 
 ## 1. What we built (3–5 sentences)
 
-An LLM (DeepSeek-V3.1 via Featherless, temperature 0) extracts facts from the user’s words and signals.
-Code in rules.py turns those facts into a forced action, a minimum risk, a handoff and which questions to ask. The rules can only raise caution.
-A second LLM call writes the advice, and the kit’s text checks validate it, with a template fallback.
-The web chat adds routing of chat messages, conversation-specific questions and plain-language replies.
+- An LLM (DeepSeek-V3.1 via Featherless, temperature 0) extracts facts from the user’s words and signals.
+- Code in rules.py turns those facts into a forced action, a minimum risk, a handoff and which questions to ask. The rules can only raise caution.
+- A second LLM call writes the advice, and the kit’s text checks validate it, with a template fallback.
+- The web chat adds routing of chat messages, conversation-specific questions and plain-language replies.
 
 ## 2. Safety boundaries
 
-Forwarded message text is treated as untrusted data, so prompt-injection text inside a message is ignored.
-The assistant never asks for passwords, codes or card numbers.
-A banned-advice list is checked on every reply (“pay the fee”, “approve the prompt” and so on), with a rewrite or template fallback.
-Consent-gated signals are hidden by code until granted, not by trusting the model.
+- Forwarded message text is treated as untrusted data, so prompt-injection text inside a message is ignored.
+- The assistant never asks for passwords, codes or card numbers.
+- A banned-advice list is checked on every reply (“pay the fee”, “approve the prompt” and so on), with a rewrite or template fallback.
+- Consent-gated signals are hidden by code until granted, not by trusting the model.
 
 ## 3. Five journeys
 
@@ -48,13 +48,10 @@ Three answers from the live chat were read aloud to someone outside the team. Af
 
 | Case (live chat) | Listener's own words | Understood? |
 |---|---|---|
-| Fake bank SMS asking for a €50 fee (English) | "I must under no circumstances pay the money, the message must be deleted, and my account must be checked. Also, no links should be clicked." | Yes. All four steps were repeated correctly. |
-| Clicked a "Vero" (tax) SMS link, bank credentials compromised and accounts emptied (Finnish, after confirming "kyllä" to the follow-up question) | "I need to contact my bank immediately and close my bank account and other things related to my banking credentials." | Mostly. The urgency and "contact the bank" came through, but the listener heard "close my bank account" while the advice said to block the card and change the online-banking password. |
-| Suspected invoice fraud, payment already made (English and one follow-up question) | "I need to immediately block my card and inform my bank about it." | Yes, the listener repeated the advice. But the advice itself fits poorly: an invoice paid by bank transfer calls for asking the bank to stop or recall the transfer, not for blocking a card. |
-
-**What we learned:** the first action was understood every time; leading with what to do helps. Two weaknesses showed up:
-1. Banking terms such as "block your card" vs "close your account" were mixed up by the listener. Naming exactly what to block, and why, would help.
-2. The writer reuses card wording ("block your card", "the number on your card") even when no card was involved, as in the invoice case. A transfer-specific step ("ask your bank to stop the payment") would fit better.
+| Fake bank SMS asking for a €50 fee (EN) | "I must under no circumstances pay the money, the message must be deleted, and my account must be checked. Also, no links should be clicked." | Yes |
+| Clicked a "Vero" SMS link, bank credentials stolen (FI) | "I need to contact my bank immediately and close my bank account and other things related to my banking credentials." | Partly. Said "close account", advice said block card |
+| Suspected invoice fraud, already paid (EN) | "I need to immediately block my card and inform my bank about it." | Yes, but blocking the card doesn't fit a bank transfer |
+s
 
 ## 7. Privacy and consent
 
