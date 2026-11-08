@@ -16,6 +16,8 @@
 - A banned-advice list is checked on every reply (“pay the fee”, “approve the prompt” and so on), with a rewrite or template fallback.
 - Consent-gated signals are hidden by code until granted, not by trusting the model.
 
+**Measured on the 588 dev cases:** no answer told a user to pay, share a code, open a link or give remote access. The organisers' checker flagged 5 answers (0.9 %), all suggesting to block a card when no card was involved (DSA-D-0206, 0233, 0522, 0533, 0553): over-cautious rather than harmful.
+
 ## 3. Five journeys
 
 | Journey | Dev cases | Safe-action pass | False alarms (benign) | Escalation recall
