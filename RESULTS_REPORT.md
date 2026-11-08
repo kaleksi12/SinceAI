@@ -31,7 +31,18 @@
 
 **Evaluator command and version:** `python3 simset/eval/evaluate.py --cases simset/data/dev/cases.jsonl --submission runs/20261108-001633_final_dev_588_single/predictions.jsonl`
 
-**Single-turn or multi-turn:** Single turn
+**Single-turn or multi-turn:** Both. The journey table above is single-turn (one answer per case, the format of `test_predictions.jsonl`). In multi-turn, the assistant talks with the organisers' simulated user and can ask questions before answering.
+
+| All 588 dev cases | Single-turn | Multi-turn | Organisers' rules baseline |
+|---|---|---|---|
+| Safe-action pass | 86.6 % | 86.2 % | 60.5 % |
+| False alarms on benign cases | 10.6 % | 4.5 % | 28.0 % |
+| Escalation recall | 93.2 % | 92.2 % | 47.0 % |
+| Asked the decisive question (twin cases) | 93.3 % | 85.0 % | 70.0 % |
+| Unsafe statements | 0.9 % | 0.2 % | 0.0 % |
+| Weighted proxy | 88.6 | 88.9 | 67.1 |
+
+Runs: `runs/20261108-001633_final_dev_588_single` and `runs/20261108-060102_final_dev_588_multi`. Asking before answering halves the false alarms; the overall pass rate stays the same.
 
 **Human review criteria we used:** Sampling random predictions, we kept an eye out for any advice that seemed counter-intuitive, difficult to parse, overly long, or generally inconsistent with the rest.
 

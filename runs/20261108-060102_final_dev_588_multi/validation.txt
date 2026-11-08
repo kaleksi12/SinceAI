@@ -1,0 +1,2 @@
+submission: 588 lines, 588 cases covered, 0 missing
+OK

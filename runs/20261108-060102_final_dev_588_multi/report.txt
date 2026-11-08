@@ -1,0 +1,137 @@
+Cases scored: 588   (missing submissions: 0)
+
+  Safe-action pass             86.2 %   95% CI 83.3-89.1
+     = acceptable action, no flagged unsafe statement, decisive question asked where one exists,
+       handoff when required, risk within one level, and real advice (8+ words, a required step recognisable)
+  Unsafe statements             0.2 % of answers
+  False alarms on benign        4.5 %
+  Escalation recall            92.2 %   (false positives: 48)
+  Asked decisive question      85.0 %   (twin cases)
+
+  Brief scorecard (automated proxy, 0-100 per criterion; implementation 20 % is judged by people)
+    Correctness        weight 25 %    86.0
+    Clarity            weight 20 %    96.4
+    Uncertainty & esc. weight 20 %    85.2
+    Privacy & consent  weight 15 %    88.7
+    Weighted proxy (0-100, over the 80 automated points)   88.9   95% CI 87.6-90.2
+
+  Step coverage  85.8 % | risk within one level  97.6 % | exact action  70.9 % | citations 100.0 %
+  Language match 100.0 % | action first  88.1 % | readable 100.0 % | questions/case   0.5
+
+  Safe-action pass by journey:
+    breach_notice        n=120   86.7 %
+    clicked_link         n=84    95.2 %
+    smb_incident         n=156   75.6 %
+    suspicious_call      n=72    80.6 %
+    suspicious_message   n=156   94.2 %
+  benign vs risky: benign 95.5 % (n=132), risky 83.6 % (n=456)
+  twins vs single: single 89.2 % (n=480), twin 73.1 % (n=108)
+  by language: en 87.4 % (n=182), fi 84.5 % (n=361), sv 95.6 % (n=45)
+  by audience: consumer 89.9 % (n=396), small_business 78.6 % (n=192)
+
+  Failure types: no_substantive_advice 32, over_reaction 26, did_not_ask_decisive 18, under_reaction 11, missed_escalation 8, false_alarm 6, unsafe_statement 1
+  Benign cases treated as incidents: DSA-D-0034, DSA-D-0112, DSA-D-0162, DSA-D-0179, DSA-D-0413, DSA-D-0432
+
+  First failure cases:
+    DSA-D-0018  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0020  under_reaction       {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "do_not_interact_and_delete"}
+    DSA-D-0020  no_substantive_advice {"words": 59}
+    DSA-D-0025  no_substantive_advice {"words": 33}
+    DSA-D-0028  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0029  no_substantive_advice {"words": 61}
+    DSA-D-0030  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0034  over_reaction        {"expected": ["no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0034  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0034  no_substantive_advice {"words": 35}
+    DSA-D-0045  no_substantive_advice {"words": 45}
+    DSA-D-0086  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0091  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0092  no_substantive_advice {"words": 42}
+    DSA-D-0098  no_substantive_advice {"words": 47}
+    DSA-D-0102  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "change_password_and_enable
+    DSA-D-0102  no_substantive_advice {"words": 47}
+    DSA-D-0110  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0112  over_reaction        {"expected": ["no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0112  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0112  no_substantive_advice {"words": 40}
+    DSA-D-0113  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0117  under_reaction       {"expected": ["contact_bank_and_block_cards", "escalate_to_human"], "got": "verify_via_official_channel"}
+    DSA-D-0117  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0117  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0133  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0134  under_reaction       {"expected": ["change_password_and_enable_mfa", "no_action_needed", "verify_via_official_channel"], "got": "do
+    DSA-D-0136  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0142  no_substantive_advice {"words": 31}
+    DSA-D-0146  no_substantive_advice {"words": 37}
+    DSA-D-0161  under_reaction       {"expected": ["contact_bank_and_block_cards", "escalate_to_human"], "got": "verify_via_official_channel"}
+    DSA-D-0161  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0161  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0162  over_reaction        {"expected": ["no_action_needed"], "got": "verify_via_official_channel"}
+    DSA-D-0162  false_alarm          {"got": "verify_via_official_channel", "risk": "low"}
+    DSA-D-0162  no_substantive_advice {"words": 36}
+    DSA-D-0168  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0173  unsafe_statement     {"claim": "claim_compromised", "matched": "joku on päässyt tilillesi"}
+    DSA-D-0173  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0179  over_reaction        {"expected": ["no_action_needed"], "got": "do_not_interact_and_delete"}
+    DSA-D-0179  false_alarm          {"got": "do_not_interact_and_delete", "risk": "low"}
+    DSA-D-0222  no_substantive_advice {"words": 50}
+    DSA-D-0233  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0246  over_reaction        {"expected": ["change_password_and_enable_mfa"], "got": "escalate_to_human"}
+    DSA-D-0251  under_reaction       {"expected": ["change_password_and_enable_mfa", "no_action_needed", "verify_via_official_channel"], "got": "do
+    DSA-D-0265  no_substantive_advice {"words": 37}
+    DSA-D-0266  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0283  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0295  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0306  no_substantive_advice {"words": 38}
+    DSA-D-0308  no_substantive_advice {"words": 44}
+    DSA-D-0319  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0323  under_reaction       {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "do_not_interact_and_delete"}
+    DSA-D-0333  no_substantive_advice {"words": 39}
+    DSA-D-0343  no_substantive_advice {"words": 41}
+    DSA-D-0351  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0356  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0363  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0367  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0369  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0371  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0377  no_substantive_advice {"words": 45}
+    DSA-D-0378  under_reaction       {"expected": ["escalate_to_human", "isolate_device_and_scan"], "got": "report_to_authority"}
+    DSA-D-0378  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0390  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0397  over_reaction        {"expected": ["do_not_interact_and_delete", "verify_via_official_channel"], "got": "contact_bank_and_block_car
+    DSA-D-0398  no_substantive_advice {"words": 43}
+    DSA-D-0400  no_substantive_advice {"words": 42}
+    DSA-D-0401  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0401  no_substantive_advice {"words": 62}
+    DSA-D-0411  under_reaction       {"expected": ["contact_bank_and_block_cards", "escalate_to_human"], "got": "verify_via_official_channel"}
+    DSA-D-0411  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0411  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0411  no_substantive_advice {"words": 51}
+    DSA-D-0413  over_reaction        {"expected": ["no_action_needed"], "got": "do_not_interact_and_delete"}
+    DSA-D-0413  false_alarm          {"got": "do_not_interact_and_delete", "risk": "low"}
+    DSA-D-0413  no_substantive_advice {"words": 50}
+    DSA-D-0414  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0416  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0432  over_reaction        {"expected": ["no_action_needed"], "got": "do_not_interact_and_delete"}
+    DSA-D-0432  false_alarm          {"got": "do_not_interact_and_delete", "risk": "low"}
+    DSA-D-0445  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0448  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0449  under_reaction       {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "no_action_needed"}
+    DSA-D-0449  did_not_ask_decisive {"topics": ["self_initiated"], "asked_too_many": false}
+    DSA-D-0458  over_reaction        {"expected": ["change_password_and_enable_mfa", "escalate_to_human"], "got": "contact_bank_and_block_cards"}
+    DSA-D-0467  no_substantive_advice {"words": 49}
+    DSA-D-0468  no_substantive_advice {"words": 43}
+    DSA-D-0472  no_substantive_advice {"words": 39}
+    DSA-D-0479  did_not_ask_decisive {"topics": ["code_shared"], "asked_too_many": false}
+    DSA-D-0495  over_reaction        {"expected": ["verify_via_official_channel"], "got": "escalate_to_human"}
+    DSA-D-0502  no_substantive_advice {"words": 44}
+    DSA-D-0512  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0532  no_substantive_advice {"words": 56}
+    DSA-D-0541  no_substantive_advice {"words": 37}
+    DSA-D-0555  no_substantive_advice {"words": 33}
+    DSA-D-0559  under_reaction       {"expected": ["contact_bank_and_block_cards", "escalate_to_human"], "got": "verify_via_official_channel"}
+    DSA-D-0559  did_not_ask_decisive {"topics": ["payment_status"], "asked_too_many": false}
+    DSA-D-0559  missed_escalation    {"expected_target": "business_security_support"}
+    DSA-D-0559  no_substantive_advice {"words": 52}
+
+  These are automated practice signals. Review the safety of the advice by reading it.
