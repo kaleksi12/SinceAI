@@ -1,6 +1,7 @@
 # Digital Security Assistant: "What should I do now?"
 
-**Badger Squad** · DNA challenge at Since AI Hackathon 2026
+
+**Badger Squad** · DNA challenge at Since AI Hackathon 2026 · **Demo video:** https://www.youtube.com/watch?v=pOeuQ47o5js
 
 An assistant that lives inside a telecom operator's app. A consumer or a small-business user describes something worrying (a text, a call, a link they clicked, a breach notice, an odd order on the company account) and gets **one clear, proportionate next step**: what to do, why, how urgent it is, and a handoff to a human when needed. It asks only for facts that change the advice, asks for consent before looking at private data, and answers in Finnish, English or Swedish.
 
